@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{name}} - Resume</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 14px; /* Base font size */
+            line-height: 1.4;
+        }
+
+        
+
+        /* Header Section */
+        .header {
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+
+        .header h1 {
+            text-align: center;
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        /* Contact Info Container */
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem 1.5rem;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Individual Contact Items */
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Icon Styling */
+        .contact-item svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Text Content */
+        .contact-item a,
+        .contact-item span {
+            font-size: 0.875rem;
+            color: #2c3e50;
+        }
+
+
+        /* Professional Summary */
+        .professional-summary {
+            margin-bottom: 1.25rem;
+        }
+
+        .professional-summary p {
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            text-transform: uppercase;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 0.25rem;
+            color: #2c3e50;
+        }
+
+        /* Key Competencies */
+        .competencies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Experience Section */
+        .experience-item {
+            margin-bottom: 1rem;
+        }
+
+        .experience-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+
+        .job-title {
+            font-weight: 600;
+            font-size: 0.9375rem;
+        }
+
+        .date-range {
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .experience-details ul {
+            list-style-position: outside;
+            margin-left: 1.25rem;
+            font-size: 0.875rem;
+        }
+
+        .experience-details li {
+            margin-bottom: 0.25rem;
+        }
+
+        /* Education Section - Updated */
+        .education-item {
+            margin-bottom: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .education-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .education-primary {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .education-degree {
+            font-weight: 600;
+            font-size: 0.9375rem;
+        }
+
+        .education-field {
+            font-size: 0.9375rem;
+        }
+
+        .education-secondary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .education-institution {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .education-date {
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        
+
+        /* Competitions Section */
+        .competition-item {
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Two Column Layout - Updated */
+        .two-column {
+            display: grid;
+            grid-template-columns: 7fr 3fr; /* 70% - 30% split */
+            gap: 2rem;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Languages Section */
+        .languages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .language-item {
+            display: flex;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            color: #2c3e50;
+        }
+
+        .language-name {
+            font-weight: 500;
+        }
+
+        .language-name::after {
+            content: " : ";
+            font-weight: normal;
+            color: #666;
+        }
+
+        .language-level {
+            color: #666;
+        }
+
+        /* Skills Section - Updated */
+        .skills-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .skills-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .skills-row h3 {
+            font-size: 0.9375rem;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .skills-list {
+            font-size: 0.875rem;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+
+        .skills-divider {
+            width: 50%;
+            height: 1px;
+            background-color: #dee2e6;
+            margin: 0.5rem auto;
+        }
+
+        
+
+        
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <h1>{{name}}</h1>
+        <div class="contact-info">
+            <div class="contact-item">
+                <svg viewBox="0 0 512 512"><path d="M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"/></svg>
+                <a href="tel:{{phone}}">{{phone}}</a>
+            </div>
+            <div class="contact-item">
+                <svg viewBox="0 0 512 512"><path d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"/></svg>
+                <a href="mailto:{{email}}">{{email}}</a>
+            </div>
+            <div class="contact-item">
+                <svg viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+                <a href="{{github}}" target="_blank">{{github|replace("https://", "")}}</a>
+            </div>
+            <div class="contact-item">
+                <svg viewBox="0 0 448 512"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+                <a href="{{linkedin}}" target="_blank">{{linkedin|replace("https://", "")}}</a>
+            </div>
+            <div class="contact-item">
+                <svg viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"/></svg>
+                <span>{{city}}, {{country}}</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Professional Summary -->
+    <section class="professional-summary">
+        <h2 class="section-title">Summary</h2>
+        <p>{{summary}}</p>
+    </section>
+
+    
+
+    <!-- Experience Section -->
+    <section class="section">
+        <h2 class="section-title">Experience</h2>
+        {% for job in experience %}
+        <div class="experience-item">
+            <div class="experience-header">
+                <span class="job-title">{{job.title}} - {{job.company}}</span>
+                <span class="date-range">{{job.date_range}}</span>
+            </div>
+            <div class="experience-details">
+                {% if job.subtitle %}
+                <div class="subtitle">{{job.subtitle}}</div>
+                {% endif %}
+                <ul>
+                    {% for detail in job.details %}
+                    <li>{{detail}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+    <!-- Education Section -->
+    <section class="section">
+        <h2 class="section-title">Education</h2>
+        {% for edu in education %}
+        <div class="education-item">
+            <div class="education-primary">
+                <span class="education-degree">{{edu.degree}}</span>
+                {% if edu.field %}
+                <span class="education-separator">-</span>
+                <span class="education-field">{{edu.field}}</span>
+                {% endif %}
+            </div>
+            <div class="education-secondary">
+                <span class="education-institution">{{edu.institution}}</span>
+                <span class="education-date">{{edu.date_range}}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+     <!-- Volunteering Section -->
+    <section class="section">
+        <h2 class="section-title">Volunteering</h2>
+        {% for job in volunteering %}
+        <div class="experience-item">
+            <div class="experience-header">
+                <span class="job-title">{{job.title}} - {{job.company}}</span>
+                <span class="date-range">{{job.date_range}}</span>
+            </div>
+            <div class="experience-details">
+                {% if job.subtitle %}
+                <div class="subtitle">{{job.subtitle}}</div>
+                {% endif %}
+                <ul>
+                    {% for detail in job.details %}
+                    <li>{{detail}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+    <!-- Skills and Languages Row -->
+    <div class="two-column">
+        <!-- Skills Section -->
+        <section class="section">
+            <h2 class="section-title">Skills</h2>
+            <div class="skills-section">
+                <div class="skills-row technical-skills">
+                    <h3>Technical Skills</h3>
+                    <div class="skills-list">
+                        {{technical_skills|join(", ")}}
+                    </div>
+                </div>
+                <div class="skills-divider"></div>
+                <div class="skills-row soft-skills">
+                    <h3>Soft Skills</h3>
+                    <div class="skills-list">
+                        {{soft_skills|join(", ")}}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Languages Section -->
+        <section class="section">
+            <h2 class="section-title">Languages</h2>
+            <div class="languages-list">
+                {% for lang in languages %}
+                <div class="language-item">
+                    <span class="language-name">{{lang.name}}</span>
+                    <span class="language-level">{{lang.proficiency}}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <!-- Certificates & Achievements Section -->
+    <section class="section">
+        <h2 class="section-title">Certificates & Achievements</h2>
+        {% for cer in certifications %}
+        <div class="competition-item">
+            <div><strong>{{cer.name}}</strong></div>
+            <div>{{cer.organization}} - {{cer.issue_date}}</div>
+        </div>
+        {% endfor %}
+    </section>
+
+    <!-- Personal Work Section -->
+    <section class="section">
+        <h2 class="section-title">Personal Work</h2>
+        <div class="personal-work-list">
+            {% for project in personal_work %}
+            <div class="project-item">
+                <strong class="project-title">{{project.title}}:</strong>
+                <span class="project-description">{{project.description}}</span>
+            </div>
+            {% if not loop.last %}
+            <div class="project-divider"></div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+</body>
+</html>
