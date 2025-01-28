@@ -1,1 +1,1 @@
-from .resume import Address, Education, Experience, PersonalInfo, Skill, Summary, Resume
+from .resume import Address, Education, Experience, PersonalInfo, Skill, Resume

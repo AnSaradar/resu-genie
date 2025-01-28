@@ -72,8 +72,6 @@ class Certification(BaseModel):
     issue_date: date = Field(..., description="Date when the certification was issued")
 
 
-class Summary(BaseModel):
-    content: str = Field(..., description="Summary or objective statement")
 
 class Language(BaseModel):
     name : str = Field(..., description="Name of the language")
@@ -90,7 +88,6 @@ class PersonalProject(BaseModel):
 
 class Resume(BaseModel):
     personal_info: PersonalInfo
-    summary: Optional[Summary] = None
     career_experiences: List[Experience] = Field(..., description="List of work experiences")
     volunteering_experiences: List[Experience] = Field(..., description="List of volunteering experiences")
     education: List[Education] = Field(..., description="List of educational qualifications")

@@ -35,7 +35,7 @@ class ResumeController:
             "website": personal_info.get("website"),
             "city": personal_info.get("address").get("city"),
             "country": personal_info.get("address").get("country"),
-            "summary": resume.summary.content if resume.summary else "",
+            "summary": personal_info.get("profile_summary") if personal_info.get("profile_summary") else "",
             "technical_skills": [skill.name for skill in resume.technical_skills],
             "soft_skills": [skill.name for skill in resume.soft_skills],
         }
