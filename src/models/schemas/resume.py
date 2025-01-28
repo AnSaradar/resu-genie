@@ -6,7 +6,7 @@ from models.enums import SeniorityLevel, Degree
 
 
 class Address(BaseModel):
-    city: str = Field(..., description="City of residence")
+    city: Optional[str] = Field(None, description="City of residence")
     country: str = Field(..., description="Country of residence")
 
 class Link(BaseModel):
@@ -18,7 +18,7 @@ class PersonalInfo(BaseModel):
     name: str = Field(..., description="Full name of the individual")
     email: EmailStr = Field(..., description="Email address")
     phone: str = Field(..., description="Contact phone number")
-    current_job_title: Optional[str] = Field(..., description = "Current job title")
+    current_job_title: Optional[str] = Field(None, description = "Current job title")
     address: Optional[Address] = Field(None, description="Physical address of the individual")
     linkedin: Optional[str] = Field(None, description="LinkedIn profile URL")
     website: Optional[str] = Field(None, description="Personal website or portfolio URL")
@@ -30,6 +30,7 @@ class Experience(BaseModel):
     title: str = Field(..., description="Job title")
     seniority_level: SeniorityLevel = Field(..., description="Seniority level of the job")
     company: str = Field(..., description="Company name")
+    location: Optional[Address] = Field(None, description="Company Location")
     start_date: date = Field(..., description="Start date of the job")
     currently_working: bool = Field(..., description="Indicates if the person is currently working at this job")
     end_date: Optional[date] = Field(
@@ -89,15 +90,15 @@ class PersonalProject(BaseModel):
 
 class Resume(BaseModel):
     personal_info: PersonalInfo
-    summary: Optional[Summary]
-    carrer_experiences: List[Experience] = Field(..., description="List of work experiences")
-    volunteering_experiences: List[Experience] = Field(..., description="List of work experiences")
+    summary: Optional[Summary] = None
+    career_experiences: List[Experience] = Field(..., description="List of work experiences")
+    volunteering_experiences: List[Experience] = Field(..., description="List of volunteering experiences")
     education: List[Education] = Field(..., description="List of educational qualifications")
     technical_skills: List[Skill] = Field(..., description="List of Technical Skills")
     soft_skills: List[Skill] = Field(..., description="List of Soft Skills")
     certifications: Optional[List[Certification]] = Field(None, description="List of certifications")
-    languages: Optional[List[Language]] = Field(..., description="List of languages known")
-    personal_projects: Optional[List[PersonalProject]] = Field(..., description="List of presonal projects")
-    personal_links: Optional[List[Link]] = Field(..., description="Proffesional Social Media and Portfolio Links")
+    languages: List[Language] = Field(..., description="List of languages known")
+    personal_projects: Optional[List[PersonalProject]] = Field(None, description="List of presonal projects")
+    personal_links: Optional[List[Link]] = Field(None, description="List of presonal links")
         
 

@@ -45,6 +45,8 @@ class ResumeController:
             {
                 "title": exp.title,
                 "company": exp.company,
+                "seniority_level": exp.seniority_level.value,
+                "location": exp.location,
                 "date_range": self.format_date_range(
                     exp.start_date,
                     exp.end_date,
@@ -52,7 +54,7 @@ class ResumeController:
                 ),
                 "details": [exp.description] if exp.description else [],
             }
-            for exp in resume.carrer_experiences
+            for exp in resume.career_experiences
         ]
 
         # Process Volunteering
@@ -60,6 +62,8 @@ class ResumeController:
             {
                 "title": exp.title,
                 "company": exp.company,
+                "seniority_level": exp.seniority_level.value,
+                "location": exp.location,
                 "date_range": self.format_date_range(
                     exp.start_date,
                     exp.end_date,
