@@ -8,12 +8,17 @@ from models.enums import SeniorityLevel, Degree
 class Address(BaseModel):
     city: str = Field(..., description="City of residence")
     country: str = Field(..., description="Country of residence")
+
+class Link(BaseModel):
+    website_name: str = Field(..., description="The name of the website")
+    website_url: str = Field(..., description="URL of the website")
     
 
 class PersonalInfo(BaseModel):
     name: str = Field(..., description="Full name of the individual")
     email: EmailStr = Field(..., description="Email address")
     phone: str = Field(..., description="Contact phone number")
+    current_job_title: Optional[str] = Field(..., description = "Current job title")
     address: Optional[Address] = Field(None, description="Physical address of the individual")
     linkedin: Optional[str] = Field(None, description="LinkedIn profile URL")
     website: Optional[str] = Field(None, description="Personal website or portfolio URL")
@@ -93,5 +98,6 @@ class Resume(BaseModel):
     certifications: Optional[List[Certification]] = Field(None, description="List of certifications")
     languages: Optional[List[Language]] = Field(..., description="List of languages known")
     personal_projects: Optional[List[PersonalProject]] = Field(..., description="List of presonal projects")
+    personal_links: Optional[List[Link]] = Field(..., description="Proffesional Social Media and Portfolio Links")
         
 

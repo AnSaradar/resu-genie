@@ -30,6 +30,7 @@ class ResumeController:
             "name": personal_info.get("name"),
             "email": personal_info.get("email"),
             "phone": personal_info.get("phone"),
+            "job_title": personal_info.get("current_job_title"),
             "linkedin": personal_info.get("linkedin"),
             "website": personal_info.get("website"),
             "city": personal_info.get("address").get("city"),
