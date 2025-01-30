@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, validator, EmailStr, model_validator
 from typing import List, Optional
 from bson.objectid import ObjectId
 from datetime import date
-from models.enums import SeniorityLevel, Degree
+from enums import SeniorityLevel, Degree
 
 
 class Address(BaseModel):

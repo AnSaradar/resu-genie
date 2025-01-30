@@ -1,8 +1,8 @@
 from fastapi import FastAPI, APIRouter, Depends , status
 from fastapi.responses import JSONResponse, FileResponse
-from helpers.config import get_settings ,Settings
-from models.enums import ResponseSignal,TemplateEnum
-from models.schemas import Resume
+from core.config import get_settings ,Settings
+from enums import ResponseSignal,TemplateEnum
+from schemas import Resume
 from controllers import ResumeController
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
