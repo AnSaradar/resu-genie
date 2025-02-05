@@ -1,1 +1,2 @@
+from .BaseController import BaseController
 from .ResumeController import ResumeController
