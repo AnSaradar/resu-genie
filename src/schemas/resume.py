@@ -3,16 +3,7 @@ from typing import List, Optional
 from bson.objectid import ObjectId
 from datetime import date
 from enums import SeniorityLevel, Degree
-
-
-class Address(BaseModel):
-    city: Optional[str] = Field(None, description="City of residence")
-    country: str = Field(..., description="Country of residence")
-
-class Link(BaseModel):
-    website_name: str = Field(..., description="The name of the website")
-    website_url: str = Field(..., description="URL of the website")
-    
+from .common import Address, Certification, Language, Link, Skill
 
 class PersonalInfo(BaseModel):
     name: str = Field(..., description="Full name of the individual")
@@ -64,22 +55,7 @@ class Education(BaseModel):
     end_date: Optional[date] = Field(None, description="End date of the education program, if applicable")
     description: Optional[str] = Field(None, description="Details about the education program")
 
-        
-
-class Certification(BaseModel):
-    name: str = Field(..., description="Name of the certification")
-    issuing_organization: str = Field(..., description="Organization that issued the certification")
-    issue_date: date = Field(..., description="Date when the certification was issued")
-
-
-
-class Language(BaseModel):
-    name : str = Field(..., description="Name of the language")
-    proficiency: str = Field(..., description="Proficiency of the language")
-
-class Skill(BaseModel):
-    name: str = Field(..., description="Name of the skill")
-    proficiency: Optional[str] = Field(None, description="Proficiency level (e.g., Beginner, Intermediate, Advanced)")
+    
 
 class PersonalProject(BaseModel):
     title: str = Field(..., description="The name of the project")
