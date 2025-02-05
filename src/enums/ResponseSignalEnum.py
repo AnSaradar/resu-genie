@@ -12,3 +12,9 @@ class ResponseSignal(Enum):
 
     USER_CREATION_FAILED = "User creation failed"
     USER_CREATION_SUCCESS = "User created successfully"
+
+    USER_PROFILE_ERROR = "Error while creating/updating user profile"
+    USER_PROFILE_SUCCESS = "User profile created/updated successfully"
+
+    USER_PROFILE_RETRIVE_ERROR = "Error while retrieving User Profile Data"
+    USER_PROFILE_RETRIVE_SUCCESS = "User Profile Data retrived successfully"
