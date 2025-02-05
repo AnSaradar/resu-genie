@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from typing import List
 from core.config import Settings, get_settings
-from models.user import UserCreate, UserUpdate, UserResponse, UserLogin
+from dto.user import UserCreate, UserUpdate, UserResponse, UserLogin
 from services.user import UserService
 from core.security import create_access_token, verify_password
 from enums import ResponseSignal 
