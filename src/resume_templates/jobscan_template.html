@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{name}} - Resume</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+            line-height: 1.4;
+        }
+
+        body {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .job-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .contact-info {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            float: right;
+            margin-top: -45px;
+        }
+
+        .contact-info div {
+            margin-bottom: 2px;
+        }
+
+        .summary {
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            color: #444;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        /* Experience Items */
+        .experience-item {
+            margin-bottom: 20px;
+        }
+
+        .job-header {
+            margin-bottom: 8px;
+        }
+
+        .job-position {
+            font-weight: bold;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .company-info {
+            font-style: italic;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .date-range {
+            float: right;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .job-details {
+            margin-left: 20px;
+            font-size: 13px;
+        }
+
+        .job-details li {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        /* Projects Section */
+        .project-item {
+            margin-bottom: 15px;
+        }
+
+        .project-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .project-description {
+            font-size: 13px;
+            margin-left: 20px;
+            line-height: 1.4;
+        }
+
+        /* Skills Section */
+        .skills-list {
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        /* Education Section */
+        .education-item {
+            margin-bottom: 15px;
+        }
+
+        .university {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .degree {
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header clearfix">
+        <h1 class="name">{{name}}</h1>
+        <div class="job-title">{{job_title}}</div>
+        <div class="contact-info">
+            <div>{{email}}</div>
+            <div>{{website}}</div>
+            <div>{{phone}}</div>
+            <div>{{city}}, {{country}}</div>
+        </div>
+    </header>
+
+    <!-- Summary -->
+    <div class="summary">{{summary}}</div>
+
+    <!-- Work Experience -->
+    <section class="section">
+        <h2 class="section-title">Work Experience</h2>
+        {% for job in experience %}
+        <div class="experience-item">
+            <div class="job-header">
+                <span class="job-position">{{job.title}}</span>
+                <span class="date-range">{{job.date_range}}</span>
+            </div>
+            <div class="company-info">{{job.company}} | {{job.location}}</div>
+            {% if job.details %}
+            <ul class="job-details">
+                {% for detail in job.details %}
+                <li>{{detail}}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+
+    <!-- Projects -->
+    {% if projects %}
+    <section class="section">
+        <h2 class="section-title">Projects</h2>
+        {% for project in projects %}
+        <div class="project-item">
+            <div class="project-title">{{project.title}}</div>
+            <div class="project-description">{{project.description}}</div>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    <!-- Core Skills -->
+    <section class="section">
+        <h2 class="section-title">Core Skills</h2>
+        <div class="skills-list">{{technical_skills|join(", ")}}</div>
+    </section>
+
+    <!-- Education -->
+    <section class="section">
+        <h2 class="section-title">Education</h2>
+        {% for edu in education %}
+        <div class="education-item">
+            <div class="university">{{edu.institution}}</div>
+            <div class="degree">{{edu.degree}} {{edu.field}}</div>
+            <div class="date-range">{{edu.date_range}}</div>
+        </div>
+        {% endfor %}
+    </section>
+</body>
+</html>
