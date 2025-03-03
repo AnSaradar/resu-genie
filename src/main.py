@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import base_router, resume_router, auth_router, user_profile_router
+from routes import base_router, resume_router, auth_router, user_profile_router, experience_router
 from core.config import get_settings, Settings
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
@@ -35,3 +35,4 @@ app.include_router(base_router)
 app.include_router(resume_router)
 app.include_router(auth_router)
 app.include_router(user_profile_router)
+app.include_router(experience_router)
