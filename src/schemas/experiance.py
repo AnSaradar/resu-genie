@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, validator, EmailStr, model_validator
 from typing import List, Optional
 from bson.objectid import ObjectId
 from datetime import date, datetime
-from common import Address
+from schemas.common import Address
 from enums import SeniorityLevel
 class Experience(BaseModel):
     id: Optional[ObjectId] = Field(None, alias="_id")
