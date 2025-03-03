@@ -3,6 +3,7 @@ from datetime import date
 from typing import Optional
 from schemas.common import Address
 from enums import SeniorityLevel
+from bson.objectid import ObjectId
 
 class ExperienceCreate(BaseModel):
     title: str
@@ -15,7 +16,7 @@ class ExperienceCreate(BaseModel):
     description: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ExperienceUpdate(BaseModel):
@@ -29,7 +30,7 @@ class ExperienceUpdate(BaseModel):
     description: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ExperienceResponse(BaseModel):
     title: str
@@ -44,4 +45,5 @@ class ExperienceResponse(BaseModel):
     duration: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
