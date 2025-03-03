@@ -18,3 +18,5 @@ class ResponseSignal(Enum):
 
     USER_PROFILE_RETRIVE_ERROR = "Error while retrieving User Profile Data"
     USER_PROFILE_RETRIVE_SUCCESS = "User Profile Data retrived successfully"
+
+    EXPERIENCE_CREATE_ERROR = "Error While Adding new Experainces"
