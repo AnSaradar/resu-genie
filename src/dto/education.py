@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from datetime import date
 from typing import Optional
 from enums import Degree
+ 
 
 class EducationCreate(BaseModel):
 
@@ -14,7 +15,7 @@ class EducationCreate(BaseModel):
     description: Optional[str] = Field(None, description="Details about the education program")
 
     class Config:
-            orm_mode = True
+        from_attributes = True
 
 class EducationUpdate(BaseModel):
 
@@ -27,18 +28,23 @@ class EducationUpdate(BaseModel):
     description: Optional[str] = Field(None, description="Details about the education program")
 
     class Config:
-            orm_mode = True
+        from_attributes = True
 
-
-class EducationUpdate(BaseModel):
-
+class EducationResponse(BaseModel):
+    id: str = Field(..., alias="_id")
     institution: str = Field(..., description="Name of the educational institution")
     degree: Degree = Field(..., description="Degree obtained or pursued")
-    field: str = Field(..., description="Field of study (e.g., Information Technology Engineering)")
+    field: str = Field(..., description="Field of study")
     start_date: date = Field(..., description="Start date of the education program")
     currently_studying: bool = Field(..., description="Indicates if the individual is still pursuing this degree")
     end_date: Optional[date] = Field(None, description="End date of the education program, if applicable")
     description: Optional[str] = Field(None, description="Details about the education program")
+    duration: str = Field(..., description="Duration of education (e.g., '2 years 3 months')")
 
     class Config:
-            orm_mode = True
+        from_attributes = True
+        populate_by_name = True
+
+
+
+
