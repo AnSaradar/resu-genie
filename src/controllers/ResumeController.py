@@ -1,4 +1,4 @@
-from schemas import Resume
+from schemas.resume import Resume
 import logging
 from datetime import date
 
