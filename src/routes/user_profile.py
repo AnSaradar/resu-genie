@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 import logging
 from fastapi.responses import JSONResponse
-from enums import ResponseSignal 
-from services.user_profile import UserProfileService, get_profile_service
+from enums import ResponseSignal, WorkField
+from services.user_profile import UserProfileService, get_user_profile_service
 from dto.user_profile import UserProfileCreateUpdate, UserProfileResponse
-from core.dependencies import get_current_user
+from dependencies.auth import get_current_user
 from controllers.BaseController import BaseController
+from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +19,21 @@ user_profile_router = APIRouter(
 async def create_or_update_profile(
     profile_data: UserProfileCreateUpdate,
     current_user: dict = Depends(get_current_user),  # Extract user_id from JWT
-    profile_service: UserProfileService = Depends(get_profile_service)
+    profile_service: UserProfileService = Depends(get_user_profile_service)
 ):
-    """Create or update a user profile (Authenticated user only)"""
+    """
+    Create or update a user profile (Authenticated user only)
+    
+    Fields include:
+    - linkedin_url: Optional LinkedIn profile URL
+    - website_url: Optional personal website URL
+    - birth_date: Date of birth
+    - profile_summary: Optional summary/bio
+    - address: Optional physical address
+    - current_position: Optional current job title
+    - work_field: Optional primary field of work
+    - years_of_experience: Optional years of professional experience
+    """
     user_id = current_user["user_id"]  # Extract user_id from token
 
     try:
@@ -50,7 +63,7 @@ async def create_or_update_profile(
 @user_profile_router.get("/get", response_model=UserProfileResponse)
 async def get_profile(
     current_user: dict = Depends(get_current_user),  # Extract user_id from JWT
-    profile_service: UserProfileService = Depends(get_profile_service)
+    profile_service: UserProfileService = Depends(get_user_profile_service)
 ):
     """Get the profile of the authenticated user"""
     user_id = current_user["user_id"]  # Extract user_id from token
@@ -63,3 +76,10 @@ async def get_profile(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Profile not found"
         )
+
+@user_profile_router.get("/work-fields", response_model=List[str])
+async def get_work_fields():
+    """
+    Get a list of all available work fields
+    """
+    return [field.value for field in WorkField]

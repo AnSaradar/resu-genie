@@ -2,14 +2,15 @@ from typing import Optional
 from bson import ObjectId
 from fastapi import HTTPException, Depends
 from datetime import datetime
-from enums import DataBaseCollectionNames
+from enums import DataBaseCollectionNames, WorkField
 from .base import BaseService
-from schemas.user_profile import UserProfileSchema
+from schemas.user_profile import UserProfile
 from dto.user_profile import UserProfileResponse
 import logging
 from motor.motor_asyncio import AsyncIOMotorClient
 from core.config import get_settings
 from enums import ResponseSignal
+from dependencies import get_db_client
 
 class UserProfileService(BaseService):
     def __init__(self, db_client: object):
@@ -20,8 +21,8 @@ class UserProfileService(BaseService):
     async def create_or_update_user_profile(
         self, 
         user_id: ObjectId, 
-        profile_data: UserProfileSchema
-    ) -> UserProfileSchema:
+        profile_data: UserProfile
+    ) -> UserProfile:
         try:
             # Check if profile exists
             existing_profile = await self.collection.find_one({"user_id": user_id})
@@ -30,6 +31,10 @@ class UserProfileService(BaseService):
             profile_dict = profile_data.model_dump(exclude={"id"}, exclude_unset=True)
             profile_dict["user_id"] = user_id
             profile_dict["birth_date"] = datetime.combine(profile_data.birth_date, datetime.min.time())
+            
+            # Convert WorkField enum to string if it exists
+            if profile_dict.get("work_field") and isinstance(profile_dict["work_field"], WorkField):
+                profile_dict["work_field"] = profile_dict["work_field"].value
 
             if existing_profile:
                 # Update existing profile
@@ -53,13 +58,13 @@ class UserProfileService(BaseService):
             # Get updated/created profile
             updated_profile = await self.collection.find_one({"user_id": user_id})
             self.logger.info(f"Profile created/updated successfully")
-            return UserProfileResponse(**updated_profile)
+            return await self._convert_to_response(updated_profile)
 
         except Exception as e:
             self.logger.error(f"Error in create_or_update_user_profile: {str(e)}")
             raise HTTPException(status_code=400, detail=ResponseSignal.USER_PROFILE_ERROR.value)
 
-    async def get_user_profile(self, user_id: ObjectId) -> Optional[UserProfileSchema]:
+    async def get_user_profile(self, user_id: ObjectId) -> Optional[UserProfile]:
         try:
             profile = await self.collection.find_one({"user_id": user_id})
             if not profile:
@@ -67,8 +72,9 @@ class UserProfileService(BaseService):
                     status_code=404,
                     detail="Profile not found"
                 )
-            profile["birth_date"] = profile["birth_date"].date()
-            return UserProfileSchema(**profile)
+            
+            return await self._convert_to_response(profile)
+            
         except Exception as e:
             self.logger.error(f"Error in get_user_profile: {str(e)}")
             raise HTTPException(status_code=400, detail=ResponseSignal.USER_PROFILE_RETRIVE_ERROR.value)
@@ -76,8 +82,8 @@ class UserProfileService(BaseService):
     async def update_user_profile(
         self, 
         user_id: ObjectId, 
-        update_data: UserProfileSchema
-    ) -> UserProfileSchema:
+        update_data: UserProfile
+    ) -> UserProfile:
         try:
             # Check if profile exists
             existing_profile = await self.collection.find_one({"user_id": user_id})
@@ -92,6 +98,11 @@ class UserProfileService(BaseService):
                 exclude={"id", "user_id", "created_at"}, 
                 exclude_unset=True
             )
+            
+            # Convert WorkField enum to string if it exists
+            if update_dict.get("work_field") and isinstance(update_dict["work_field"], WorkField):
+                update_dict["work_field"] = update_dict["work_field"].value
+                
             update_dict["updated_at"] = datetime.utcnow()
 
             # Update profile
@@ -108,7 +119,7 @@ class UserProfileService(BaseService):
 
             # Get updated profile
             updated_profile = await self.collection.find_one({"user_id": user_id})
-            return UserProfileSchema(**updated_profile)
+            return await self._convert_to_response(updated_profile)
 
         except Exception as e:
             self.logger.error(f"Error in update_user_profile: {str(e)}")
@@ -127,15 +138,22 @@ class UserProfileService(BaseService):
         except Exception as e:
             self.logger.error(f"Error in delete_user_profile: {str(e)}")
             raise HTTPException(status_code=500, detail="Internal server error")
+            
+    async def _convert_to_response(self, profile: dict) -> UserProfileResponse:
+        """Convert a MongoDB profile to a UserProfileResponse"""
+        # Convert datetime to date for birth_date
+        if "birth_date" in profile and isinstance(profile["birth_date"], datetime):
+            profile["birth_date"] = profile["birth_date"].date()
+            
+        # Convert work_field string to enum if it exists
+        if "work_field" in profile and profile["work_field"] is not None:
+            try:
+                profile["work_field"] = WorkField(profile["work_field"])
+            except ValueError:
+                # If the value doesn't match any enum, set to None or OTHER
+                profile["work_field"] = WorkField.OTHER
+        
+        return UserProfileResponse(**profile)
 
-async def get_profile_service():
-    """
-    Dependency that provides a UserProfileService instance with database connection
-    """
-    app_settings = get_settings()
-    client = AsyncIOMotorClient(app_settings.MONGODB_URL)
-    try:
-        db = client[app_settings.MONGODB_DATABASE]
-        yield UserProfileService(db)
-    finally:
-        client.close()
+def get_user_profile_service(db_client: AsyncIOMotorClient = Depends(get_db_client)):
+    return UserProfileService(db_client)
