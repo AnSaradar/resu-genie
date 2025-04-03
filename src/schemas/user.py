@@ -3,7 +3,7 @@ from typing import List, Optional
 from bson.objectid import ObjectId
 from datetime import date, datetime
 
-class UserSchema(BaseModel):
+class User(BaseModel):
     id: Optional[ObjectId] = Field(None, alias="_id")
     email: EmailStr
     password: str

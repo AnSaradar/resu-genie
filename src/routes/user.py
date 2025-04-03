@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
-from typing import List
+from typing import List, Dict, Any
 from core.config import Settings, get_settings
 from dto.user import UserCreate, UserUpdate, UserResponse, UserLogin
-from services.user import UserService
+from services.user import UserService, get_user_service
 from core.security import create_access_token, verify_password
 from enums import ResponseSignal 
 import logging
+from dependencies.auth import get_current_user
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,73 +21,101 @@ auth_router = APIRouter(
 # Auth endpoints
 @auth_router.post("/login", tags=["Authentication"])
 async def login(
-    request: Request,
     user_login_data: UserLogin,
-    app_settings: Settings = Depends(get_settings)
-):
+    user_service: UserService = Depends(get_user_service)
+) -> JSONResponse:
+    """
+    Authenticate a user and return an access token.
+    
+    Returns a 401 status code for invalid credentials.
+    Returns a 200 status code with an access token on successful login.
+    """
     try:
-        user_service = UserService(request.app.db_client)
+        # Try to find user by email
         user = await user_service.get_user_by_email(user_login_data.email)
         
+        # Check if user exists and password is correct
         if not user or not verify_password(user_login_data.password, user["password"]):
-            raise HTTPException(
+            logger.warning(f"Failed login attempt for email: {user_login_data.email}")
+            return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=ResponseSignal.INCORRECT_CREDENTIALS.value
+                content={
+                    "status": "error",
+                    "message": "Invalid email or password"
+                }
             )
         
-        #role = "admin" if user.get("is_admin", False) else "user"
+        # Generate access token with user information
         access_token = create_access_token(
             user_id=str(user["_id"]),
             email=user["email"],
             role="user"
         )
         
-        logger.info(ResponseSignal.LOGIN_SUCCESS.value)
+        logger.info(f"Successful login for user: {user_login_data.email}")
         return JSONResponse(
             status_code=status.HTTP_200_OK, 
             content={
+                "status": "success",
+                "message": "Login successful",
                 "access_token": access_token,
                 "token_type": "bearer"
             }
         )
     
-    
-    except HTTPException as http_exc:  # Catch specific HTTP exceptions
-        return JSONResponse(
-            status_code=http_exc.status_code,
-            content={"signal": ResponseSignal.LOGIN_FAILED.value, "detail": http_exc.detail}
-        )
-    
     except Exception as e:
-        logger.error(f"Error logging in user: {str(e)}")
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
-                            content={"signal": ResponseSignal.LOGIN_FAILED.value})
+        logger.error(f"Error during login: {str(e)}")
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "status": "error",
+                "message": "Server error during login"
+            }
+        )
 
-@auth_router.post("/register", response_model=UserResponse, tags=["Authentication"])
+@auth_router.post("/register", response_model=Dict[str, Any], tags=["Authentication"])
 async def register_user(
-    request: Request,
     user_data: UserCreate,
-):
+    user_service: UserService = Depends(get_user_service)
+) -> JSONResponse:
+    """
+    Register a new user.
+    
+    Returns a 409 status code if the email or phone number is already registered.
+    Returns a 201 status code on successful registration.
+    """
     try:
-        user_service = UserService(request.app.db_client)
-        user_data = await user_service.create_user(user_data)
+        await user_service.create_user(user_data)
         
+        logger.info(f"User registered successfully: {user_data.email}")
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
-            content={"signal": ResponseSignal.USER_CREATION_SUCCESS.value}
-              # Add user ID to response header for future reference.
+            content={
+                "status": "success",
+                "message": "User registered successfully"
+            }
         )
     
-    except HTTPException as http_exc:  # Catch specific HTTP exceptions
+    except HTTPException as http_exc:
+        # Handle specific HTTP exceptions from the service
+        logger.warning(f"Registration error: {http_exc.detail}")
         return JSONResponse(
             status_code=http_exc.status_code,
-            content={"signal": ResponseSignal.USER_CREATION_FAILED.value, "detail": http_exc.detail}
+            content={
+                "status": "error",
+                "message": http_exc.detail
+            }
         )
     
     except Exception as e:
-        logger.error(f"Error registering user: {str(e)}")
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
-                            content={"signal": ResponseSignal.USER_CREATION_FAILED.value})
+        logger.error(f"Unexpected error during registration: {str(e)}")
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "status": "error",
+                "message": "Server error during registration"
+            }
+        )
 
 # User management endpoints
 # @auth_router.get("/me", response_model=UserResponse, tags=["User"])
