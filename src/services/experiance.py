@@ -3,12 +3,13 @@ from bson import ObjectId
 from fastapi import HTTPException
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
-from core.config import get_settings
 from enums import DataBaseCollectionNames, ResponseSignal
 from .base import BaseService
 from schemas.experiance import Experience
 from dto.experiance import ExperienceCreate, ExperienceUpdate, ExperienceResponse
 import logging
+from dependencies import get_db_client
+from fastapi import Depends
 
 class ExperienceService(BaseService):
     def __init__(self, db_client: object):
@@ -151,12 +152,6 @@ class ExperienceService(BaseService):
                 detail=ResponseSignal.EXPERIENCE_DELETE_ERROR.value
             )
 
-async def get_experience_service():
-    """Dependency that provides an ExperienceService instance"""
-    app_settings = get_settings()
-    client = AsyncIOMotorClient(app_settings.MONGODB_URL)
-    try:
-        db = client[app_settings.MONGODB_DATABASE]
-        yield ExperienceService(db)
-    finally:
-        client.close()
+
+def get_experience_service(db_client: AsyncIOMotorClient = Depends(get_db_client)):
+    return ExperienceService(db_client)

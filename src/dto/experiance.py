@@ -4,7 +4,7 @@ from typing import Optional
 from schemas.common import Address
 from enums import SeniorityLevel
 from bson.objectid import ObjectId
-
+from pydantic import Field
 class ExperienceCreate(BaseModel):
     title: str
     seniority_level: SeniorityLevel
@@ -14,6 +14,8 @@ class ExperienceCreate(BaseModel):
     currently_working: bool
     end_date: Optional[date] = None
     description: Optional[str] = None
+    is_volunteer: bool = Field(False, description="Indicates if the job is a volunteer position")
+    
 
     class Config:
         from_attributes = True
@@ -28,6 +30,8 @@ class ExperienceUpdate(BaseModel):
     currently_working: Optional[bool] = None
     end_date: Optional[date] = None
     description: Optional[str] = None
+    is_volunteer: bool = Field(False, description="Indicates if the job is a volunteer position")
+
 
     class Config:
         from_attributes = True
@@ -43,6 +47,8 @@ class ExperienceResponse(BaseModel):
     description: Optional[str] = None
     is_active: bool
     duration: str
+    is_volunteer: bool = Field(False, description="Indicates if the job is a volunteer position")
+
 
     class Config:
         from_attributes = True

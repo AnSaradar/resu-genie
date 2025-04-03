@@ -6,7 +6,7 @@ from bson import ObjectId
 from enums import ResponseSignal
 from services.experiance import ExperienceService, get_experience_service
 from dto.experiance import ExperienceCreate, ExperienceUpdate, ExperienceResponse
-from core.dependencies import get_current_user
+from dependencies.auth import get_current_user
 from controllers.BaseController import BaseController
 
 logger = logging.getLogger(__name__)
