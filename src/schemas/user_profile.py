@@ -13,6 +13,7 @@ class UserProfile(BaseModel):
     birth_date: date
     profile_summary: Optional[str]
     address: Optional[Address]
+    country_of_residence: Optional[str]
     current_position: Optional[str] = Field(None, description="Current job position/title")
     work_field: Optional[WorkField] = Field(None, description="Primary field of work")
     years_of_experience: Optional[int] = Field(None, description="Total years of professional experience", ge=0, le=50)

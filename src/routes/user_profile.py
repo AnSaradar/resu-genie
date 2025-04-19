@@ -15,10 +15,10 @@ user_profile_router = APIRouter(
     tags=["api_v1", "user_profile"],
 )
 
-@user_profile_router.post("/post", response_model=UserProfileResponse)
+@user_profile_router.post("", response_model=UserProfileResponse)
 async def create_or_update_profile(
     profile_data: UserProfileCreateUpdate,
-    current_user: dict = Depends(get_current_user),  # Extract user_id from JWT
+    current_user: dict = Depends(get_current_user),  # User document from DB
     profile_service: UserProfileService = Depends(get_user_profile_service)
 ):
     """
@@ -30,11 +30,12 @@ async def create_or_update_profile(
     - birth_date: Date of birth
     - profile_summary: Optional summary/bio
     - address: Optional physical address
+    - country_of_residence: Optional country of residence
     - current_position: Optional current job title
     - work_field: Optional primary field of work
     - years_of_experience: Optional years of professional experience
     """
-    user_id = current_user["user_id"]  # Extract user_id from token
+    user_id = current_user["_id"]  # Extract user_id using the correct key
 
     try:
         updated_profile_data = await profile_service.create_or_update_user_profile(
@@ -42,10 +43,19 @@ async def create_or_update_profile(
             profile_data
         )
         #logger.info(updated_profile_data)
-        updated_profile_data = BaseController().get_json_serializable_object(updated_profile_data)
+        # Convert the response object (which might contain ObjectId) to a serializable dict
+        # Assuming UserProfileResponse handles ObjectId serialization via its Config
+        # If create_or_update_user_profile returns a Pydantic model, direct conversion might not be needed.
+        # Let's assume the service returns a Pydantic model or a dict ready for response.
+        
+        # We should return the Pydantic model directly if the function signature allows
+        # However, the original code returns JSONResponse manually. Let's stick to that pattern for now,
+        # but ideally, just returning the Pydantic model would be cleaner.
+        response_content = BaseController().get_json_serializable_object(updated_profile_data) # Use model_dump for Pydantic v2
+
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content={"signal": ResponseSignal.USER_PROFILE_SUCCESS.value, "profile_data": updated_profile_data}
+            content={"signal": ResponseSignal.USER_PROFILE_SUCCESS.value, "profile_data": response_content}
         )
     
     except HTTPException as http_exc:  # Catch specific HTTP exceptions
@@ -60,16 +70,18 @@ async def create_or_update_profile(
             detail=ResponseSignal.USER_PROFILE_ERROR.value
         )
 
-@user_profile_router.get("/get", response_model=UserProfileResponse)
+@user_profile_router.get("", response_model=UserProfileResponse)
 async def get_profile(
-    current_user: dict = Depends(get_current_user),  # Extract user_id from JWT
+    current_user: dict = Depends(get_current_user),  # User document from DB
     profile_service: UserProfileService = Depends(get_user_profile_service)
 ):
     """Get the profile of the authenticated user"""
-    user_id = current_user["user_id"]  # Extract user_id from token
+    user_id = current_user["_id"]  # Extract user_id using the correct key
 
     try:
-        return await profile_service.get_user_profile(user_id)
+        # The service method already returns the correct Pydantic model
+        profile_response = await profile_service.get_user_profile(user_id)
+        return profile_response 
     except Exception as e:
         logger.error(f"Error retrieving profile: {str(e)}")
         raise HTTPException(
