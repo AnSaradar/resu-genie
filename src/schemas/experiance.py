@@ -19,6 +19,10 @@ class Experience(BaseModel):
     )
     description: Optional[str] = Field(None, description="Description of job responsibilities and achievements")
     is_volunteer: bool = Field(False, description="Indicates if the job is a volunteer position")
+    
+    #TODO: Work Type: Full Time, etc.., Work Model: Remote, Hybrid, Onsite
+    
+    
     @property
     def is_active(self) -> bool:
         """Helper property to determine if this is a current job."""
