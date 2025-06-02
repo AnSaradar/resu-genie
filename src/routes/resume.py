@@ -12,7 +12,7 @@ from dependencies import get_current_user
 from schemas.user import User
 from services.user_profile import get_user_profile_service, UserProfileService
 from services.education import get_education_service, EducationService
-from services.experiance import get_experience_service, ExperienceService
+from services.experience import get_experience_service, ExperienceService
 from services.skill import get_skill_service, SkillService
 from services.language import get_language_service, LanguageService
 from services.certification import get_certification_service, CertificationService
