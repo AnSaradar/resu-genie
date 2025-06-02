@@ -7,13 +7,13 @@ class CoHereProvider(LLMInterface):
     def __init__(self, api_key: str,
                  default_input_max_characters: int = 1000,
                  default_generation_max_output_tokens: int = 1000,
-                 default_generation_tempreature: float = 0.3):
+                 default_generation_temperature: float = 0.3):
         
         self.api_key = api_key
         
         self.default_input_max_characters = default_input_max_characters
         self.default_generation_max_output_tokens = default_generation_max_output_tokens
-        self.default_generation_tempreature = default_generation_tempreature
+        self.default_generation_temperature = default_generation_temperature
 
         self.generation_model_id = None
         self.embedding_model_id = None
@@ -47,7 +47,7 @@ class CoHereProvider(LLMInterface):
 
         max_output_tokens = max_output_tokens if max_output_tokens else self.default_generation_max_output_tokens
 
-        temperature = temperature if temperature else self.default_generation_tempreature
+        temperature = temperature if temperature else self.default_generation_temperature
         
         response  = self.client.chat(
             model = self.generation_model_id,
@@ -57,7 +57,7 @@ class CoHereProvider(LLMInterface):
             max_tokens = max_output_tokens
         )
 
-        if not response or response.text:
+        if not response or not response.text:
             self.logger.error("CoHere Client : Failed to generate text.")
             return None
 

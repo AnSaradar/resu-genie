@@ -13,7 +13,7 @@ class LLMProviderFactory:
                 api_url =  self.config.OPENAI_API_URL,
                 default_generation_max_output_tokens = self.config.DEFAULT_GENERATION_MAX_OUTPUT_TOKENS,
                 default_input_max_characters = self.config.DEFAULT_INPUT_MAX_CHARACTERS,
-                default_generation_temperature = self.config.DEFAULT_GENERATION_TEMPREATUER 
+                default_generation_temperature = self.config.DEFAULT_GENERATION_TEMPERATURE
             )
         
         if provider == LLMEnums.COHERE.value:
@@ -21,7 +21,7 @@ class LLMProviderFactory:
                 api_key =  self.config.COHERE_API_KEY,
                 default_generation_max_output_tokens = self.config.DEFAULT_GENERATION_MAX_OUTPUT_TOKENS,
                 default_input_max_characters = self.config.DEFAULT_INPUT_MAX_CHARACTERS,
-                default_generation_tempreature = self.config.DEFAULT_GENERATION_TEMPREATUER 
+                default_generation_temperature = self.config.DEFAULT_GENERATION_TEMPERATURE 
             )
 
         
