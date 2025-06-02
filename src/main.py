@@ -4,7 +4,8 @@ from core.config import get_settings, Settings
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
 from fastapi.middleware.cors import CORSMiddleware
-
+from llm import LLMProviderFactory
+from llm.prompt_templates import TemplateParser
 
 app = FastAPI()
 
@@ -40,6 +41,17 @@ async def startup():
         logger.info(f"Connected to MongoDB at {settings.MONGODB_URL}")
     except Exception as e:
         logger.error(f"Error connecting to MongoDB: {str(e)}")
+
+   # ======================LLM Initialization ======================
+    try:
+        llm_provider_factory = LLMProviderFactory(settings)
+        app.generation_client = llm_provider_factory.create(provider=settings.GENERATION_BACKEND)
+        app.generation_client.set_generation_model(model_id=settings.GENERATION_MODEL_ID)
+        app.template_parser = TemplateParser(language=settings.PRIMARY_LANGUAGE,
+                                            default_language=settings.DEFAULT_LANGUAGE)
+        logger.info(f"Initialized LLM with provider: {settings.GENERATION_BACKEND}")
+    except Exception as e:
+        logger.error(f"Error initializing LLM components: {str(e)}")
 
 # =================Routers Configurations=================
 app.include_router(base_router)
