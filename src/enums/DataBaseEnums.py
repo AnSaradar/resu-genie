@@ -9,4 +9,6 @@ class DataBaseCollectionNames(Enum):
     LANGUAGES = "languages"
     CERTIFICATIONS = "certifications"
     LINKS = "links"
+    EVALUATIONS = "evaluations"
+    COMPLETE_EVALUATIONS = "complete_evaluations"
     

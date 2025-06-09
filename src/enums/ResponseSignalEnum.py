@@ -25,12 +25,23 @@ class ResponseSignal(Enum):
     USER_PROFILE_RETRIVE_SUCCESS = "User Profile Data retrived successfully"
 
     EXPERIENCE_CREATE_ERROR = "Error While Adding new Experainces"
+    EXPERIENCE_CREATE_SUCCESS = "Experience Added Successfully"
+    EXPERIENCE_RETRIEVE_ERROR = "Error While Retrieving Experiences"
+    EXPERIENCE_RETRIEVE_SUCCESS = "Experiences Retrived Successfully"
+    EXPERIENCE_UPDATE_ERROR = "Error While Updating Experiences"
+    EXPERIENCE_UPDATE_SUCCESS = "Experience Updated Successfully"
+    EXPERIENCE_DELETE_ERROR = "Error While Deleting Experiences"
+    EXPERIENCE_DELETE_SUCCESS = "Experience Deleted Successfully"
     
     # Education related signals
     EDUCATION_CREATE_ERROR = "Error while adding new education entries"
+    EDUCATION_CREATE_SUCCESS = "Education Added Successfully"
     EDUCATION_RETRIEVE_ERROR = "Error while retrieving education data"
+    EDUCATION_RETRIEVE_SUCCESS = "Education Retrived Successfully"
     EDUCATION_UPDATE_ERROR = "Error while updating education entry"
+    EDUCATION_UPDATE_SUCCESS = "Education Updated Successfully"
     EDUCATION_DELETE_ERROR = "Error while deleting education entry"
+    EDUCATION_DELETE_SUCCESS = "Education Deleted Successfully"
     EDUCATION_NOT_FOUND = "Education entry not found"
     
     # Skill related signals
@@ -39,6 +50,11 @@ class ResponseSignal(Enum):
     SKILL_UPDATE_ERROR = "Error while updating skill entry"
     SKILL_DELETE_ERROR = "Error while deleting skill entry"
     SKILL_NOT_FOUND = "Skill entry not found"
+    SKILL_CREATE_SUCCESS = "Skill Added Successfully"
+    SKILL_RETRIEVE_SUCCESS = "Skill Retrived Successfully"
+    SKILL_UPDATE_SUCCESS = "Skill Updated Successfully"
+    SKILL_DELETE_SUCCESS = "Skill Deleted Successfully"
+    
     
     # Language related signals
     LANGUAGE_CREATE_ERROR = "Error while adding new language entries"
@@ -46,6 +62,10 @@ class ResponseSignal(Enum):
     LANGUAGE_UPDATE_ERROR = "Error while updating language entry"
     LANGUAGE_DELETE_ERROR = "Error while deleting language entry"
     LANGUAGE_NOT_FOUND = "Language entry not found"
+    LANGUAGE_CREATE_SUCCESS = "Language Added Successfully"
+    LANGUAGE_RETRIEVE_SUCCESS = "Language Retrived Successfully"
+    LANGUAGE_UPDATE_SUCCESS = "Language Updated Successfully"
+    LANGUAGE_DELETE_SUCCESS = "Language Deleted Successfully"
     
     # Link related signals
     LINK_CREATE_ERROR = "Error while adding new link entries"
@@ -53,6 +73,10 @@ class ResponseSignal(Enum):
     LINK_UPDATE_ERROR = "Error while updating link entry"
     LINK_DELETE_ERROR = "Error while deleting link entry"
     LINK_NOT_FOUND = "Link entry not found"
+    LINK_CREATE_SUCCESS = "Link Added Successfully"
+    LINK_RETRIEVE_SUCCESS = "Link Retrived Successfully"
+    LINK_UPDATE_SUCCESS = "Link Updated Successfully"
+    LINK_DELETE_SUCCESS = "Link Deleted Successfully"
     
     # Certification related signals
     CERTIFICATION_CREATE_ERROR = "Error while adding new certification entries"
@@ -60,3 +84,15 @@ class ResponseSignal(Enum):
     CERTIFICATION_UPDATE_ERROR = "Error while updating certification entry"
     CERTIFICATION_DELETE_ERROR = "Error while deleting certification entry"
     CERTIFICATION_NOT_FOUND = "Certification entry not found"
+    CERTIFICATION_CREATE_SUCCESS = "Certification Added Successfully"
+    CERTIFICATION_RETRIEVE_SUCCESS = "Certification Retrived Successfully"
+    CERTIFICATION_UPDATE_SUCCESS = "Certification Updated Successfully"
+    CERTIFICATION_DELETE_SUCCESS = "Certification Deleted Successfully"
+
+    # Evaluation related signals
+    EVALUATION_SUCCESS = "Evaluation completed successfully"
+    EVALUATION_ERROR = "Error during evaluation"
+    EVALUATION_RETRIEVE_SUCCESS = "Evaluation retrieved successfully"
+    EVALUATION_RETRIEVE_ERROR = "Error retrieving evaluation"
+    EVALUATION_HISTORY_SUCCESS = "Evaluation history retrieved successfully"
+    EVALUATION_HISTORY_ERROR = "Error retrieving evaluation history"

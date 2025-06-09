@@ -1,7 +1,7 @@
 from typing import List, Optional
 from bson import ObjectId
 from fastapi import HTTPException
-from datetime import datetime
+from datetime import datetime, date
 from motor.motor_asyncio import AsyncIOMotorClient
 from enums import DataBaseCollectionNames, ResponseSignal
 from .base import BaseService
@@ -10,6 +10,7 @@ from dto.experiance import ExperienceCreate, ExperienceUpdate, ExperienceRespons
 import logging
 from dependencies import get_db_client
 from fastapi import Depends
+from core.utils import convert_dates_for_storage, prepare_experience_for_response, prepare_experiences_for_response
 
 class ExperienceService(BaseService):
     def __init__(self, db_client: object):
@@ -27,6 +28,10 @@ class ExperienceService(BaseService):
             experiences_to_insert = []
             for exp_data in experiences_data:
                 exp_dict = exp_data.model_dump(exclude_unset=True)
+                
+                # Convert date objects to datetime objects for MongoDB compatibility
+                exp_dict = convert_dates_for_storage(exp_dict)
+                
                 exp_dict["user_id"] = user_id
                 exp_dict["created_at"] = datetime.utcnow()
                 experiences_to_insert.append(exp_dict)
@@ -40,7 +45,10 @@ class ExperienceService(BaseService):
                     {"_id": {"$in": result.inserted_ids}}
                 ).to_list(None)
                 
-                return [ExperienceResponse(**exp) for exp in created_experiences]
+                # Prepare experiences for response DTOs
+                prepared_experiences = prepare_experiences_for_response(created_experiences)
+                
+                return [ExperienceResponse(**exp) for exp in prepared_experiences]
             
             return []
 
@@ -57,7 +65,10 @@ class ExperienceService(BaseService):
                 {"user_id": user_id}
             ).sort("start_date", -1).to_list(None)
             
-            return [ExperienceResponse(**exp) for exp in experiences]
+            # Prepare experiences for response DTOs
+            prepared_experiences = prepare_experiences_for_response(experiences)
+            
+            return [ExperienceResponse(**exp) for exp in prepared_experiences]
 
         except Exception as e:
             self.logger.error(f"Error in get_user_experiences: {str(e)}")
@@ -79,8 +90,11 @@ class ExperienceService(BaseService):
             
             if not experience:
                 raise HTTPException(status_code=404, detail="Experience not found")
+            
+            # Prepare experience for response DTO
+            prepared_experience = prepare_experience_for_response(experience)
                 
-            return ExperienceResponse(**experience)
+            return ExperienceResponse(**prepared_experience)
 
         except Exception as e:
             self.logger.error(f"Error in get_experience: {str(e)}")
@@ -107,6 +121,10 @@ class ExperienceService(BaseService):
 
             # Prepare update data
             update_dict = update_data.model_dump(exclude_unset=True)
+            
+            # Convert date objects to datetime objects for MongoDB compatibility
+            update_dict = convert_dates_for_storage(update_dict)
+            
             update_dict["updated_at"] = datetime.utcnow()
 
             # Update experience
@@ -120,7 +138,11 @@ class ExperienceService(BaseService):
 
             # Get updated experience
             updated_exp = await self.collection.find_one({"_id": experience_id})
-            return ExperienceResponse(**updated_exp)
+            
+            # Prepare experience for response DTO
+            prepared_experience = prepare_experience_for_response(updated_exp)
+                
+            return ExperienceResponse(**prepared_experience)
 
         except Exception as e:
             self.logger.error(f"Error in update_experience: {str(e)}")

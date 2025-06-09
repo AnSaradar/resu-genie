@@ -8,5 +8,6 @@ from .language import language_router
 from .certification import certification_router
 from .link import link_router
 from .resume import resume_router
+from .evaluation import evaluation_router
 
 

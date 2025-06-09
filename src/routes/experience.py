@@ -8,6 +8,7 @@ from services.experience import ExperienceService, get_experience_service
 from dto.experiance import ExperienceCreate, ExperienceUpdate, ExperienceResponse
 from dependencies.auth import get_current_user
 from controllers.BaseController import BaseController
+from schemas.user import User
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +20,14 @@ experience_router = APIRouter(
 @experience_router.post("/add", response_model=List[ExperienceResponse])
 async def add_experiences(
     experiences: List[ExperienceCreate],
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     experience_service: ExperienceService = Depends(get_experience_service)
 ):
     """Add multiple experiences for the authenticated user"""
+    user_id = current_user["_id"] 
     try:
         created_experiences = await experience_service.create_experiences(
-            user_id=current_user["user_id"],
+            user_id=user_id,
             experiences_data=experiences
         )
         
@@ -48,13 +50,15 @@ async def add_experiences(
 async def update_experience(
     experience_id: str,
     update_data: ExperienceUpdate,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     experience_service: ExperienceService = Depends(get_experience_service)
 ):
     """Update a specific experience entry"""
+    user_id = current_user["_id"] 
+    print(user_id)
     try:
         updated_experience = await experience_service.update_experience(
-            user_id=current_user["user_id"],
+            user_id=user_id,
             experience_id=ObjectId(experience_id),
             update_data=update_data
         )
@@ -77,13 +81,14 @@ async def update_experience(
 @experience_router.delete("/{experience_id}")
 async def delete_experience(
     experience_id: str,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     experience_service: ExperienceService = Depends(get_experience_service)
 ):
     """Delete a specific experience entry"""
+    user_id = current_user["_id"] 
     try:
         await experience_service.delete_experience(
-            user_id=current_user["user_id"],
+            user_id=user_id,
             experience_id=ObjectId(experience_id)
         )
         
@@ -102,13 +107,14 @@ async def delete_experience(
 
 @experience_router.get("/all", response_model=List[ExperienceResponse])
 async def get_all_experiences(
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     experience_service: ExperienceService = Depends(get_experience_service)
 ):
     """Get all experiences for the authenticated user"""
+    user_id = current_user["_id"] 
     try:
         experiences = await experience_service.get_user_experiences(
-            user_id=current_user["user_id"]
+            user_id=user_id
         )
         
         experiences_data = BaseController().get_json_serializable_object(experiences)

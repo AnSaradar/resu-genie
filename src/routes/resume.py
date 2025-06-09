@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter, Depends, status
 from fastapi.responses import JSONResponse, FileResponse
+from starlette.background import BackgroundTask
 from core.config import get_settings, Settings
 from enums import ResponseSignal, TemplateEnum
 from schemas.resume import Resume
@@ -19,7 +20,7 @@ from services.certification import get_certification_service, CertificationServi
 from services.link import get_link_service, LinkService
 from bson import ObjectId
 import uuid
-
+from core.utils import remove_file
 
 resume_router = APIRouter(
     prefix = "/api/v1/resume",
@@ -92,7 +93,8 @@ async def generate_resume(
     """
     try:
         # Get user ID from the authenticated user
-        user_id = current_user.id
+        user_id = current_user["_id"]
+        username = current_user["first_name"] + " " + current_user["last_name"]
         
         # Retrieve all user data from various services
         user_profile = await user_profile_service.get_user_profile(user_id)
@@ -131,7 +133,9 @@ async def generate_resume(
             soft_skills=soft_skills,
             certifications=certifications,
             languages=languages,
-            personal_links=links
+            personal_links=links,
+            personal_projects=[]  # Add this line with empty list for now
+
         )
         
         # Prepare resume data for template
@@ -154,9 +158,8 @@ async def generate_resume(
         return FileResponse(
             pdf_file_path,
             media_type="application/pdf",
-            filename=f"resume_{current_user.username}.pdf",
-            background=FileResponse.background_task_remove_file(pdf_file_path)
-        )
+            filename=f"resume_{username}.pdf",
+            background=BackgroundTask(remove_file, pdf_file_path)        )
     
     except Exception as e:
         logger.error(f"Error generating resume: {str(e)}")

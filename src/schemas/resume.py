@@ -93,7 +93,7 @@ class Resume(BaseModel):
     certifications: Optional[List[CertificationResponse]] = Field(None, description="List of certifications")
     languages: List[LanguageResponse] = Field(..., description="List of languages known")
     personal_links: Optional[List[LinkResponse]] = Field(None, description="List of presonal links")
-    
+    personal_projects: Optional[List] = Field(None, description="List of presonal projects")
     class Config:
         populate_by_name = True
         arbitrary_types_allowed = True

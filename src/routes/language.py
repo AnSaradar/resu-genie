@@ -6,10 +6,15 @@ from dto.language import LanguageCreate, LanguageUpdate, LanguageResponse, Langu
 from dependencies.auth import get_current_user
 from schemas.user import User
 from enums import ResponseSignal
+from fastapi.responses import JSONResponse
+from controllers.BaseController import BaseController
+import logging
+
+logger = logging.getLogger(__name__)
 
 language_router = APIRouter(
-    prefix="/languages",
-    tags=["languages"],
+    prefix="/api/v1/language",
+    tags=["api_v1", "language"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -22,10 +27,27 @@ async def create_languages(
     """
     Create multiple language entries for the current user.
     """
-    return await language_service.create_languages(
-        user_id=current_user.id,
-        languages_data=languages
-    )
+    user_id = current_user["_id"]
+    try:
+        created_languages = await language_service.create_languages(
+            user_id=user_id,
+            languages_data=languages
+        )
+        languages_data = BaseController().get_json_serializable_object(created_languages)
+        return JSONResponse(
+            status_code=status.HTTP_201_CREATED,
+            content={
+                "signal": ResponseSignal.LANGUAGE_CREATE_SUCCESS.value,
+                "languages": languages_data
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error in create_languages: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ResponseSignal.LANGUAGE_CREATE_ERROR.value
+        )
+
 
 @language_router.get("/", response_model=List[LanguageResponse])
 async def get_user_languages(
@@ -35,7 +57,23 @@ async def get_user_languages(
     """
     Get all language entries for the current user.
     """
-    return await language_service.get_user_languages(user_id=current_user.id)
+    user_id = current_user["_id"]
+    try:
+        user_languages = await language_service.get_user_languages(user_id=user_id)
+        languages_data = BaseController().get_json_serializable_object(user_languages)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "signal": ResponseSignal.LANGUAGE_RETRIEVE_SUCCESS.value,
+                "languages": languages_data
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error in get_user_languages: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ResponseSignal.LANGUAGE_RETRIEVE_ERROR.value
+        )
 
 @language_router.get("/grouped", response_model=List[LanguagesGroupResponse])
 async def get_grouped_languages(
@@ -45,7 +83,23 @@ async def get_grouped_languages(
     """
     Get all languages for the current user, grouped by proficiency level.
     """
-    return await language_service.group_languages_by_proficiency(user_id=current_user.id)
+    user_id = current_user["_id"]
+    try:
+        user_languages = await language_service.group_languages_by_proficiency(user_id=user_id)
+        languages_data = BaseController().get_json_serializable_object(user_languages)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "signal": ResponseSignal.LANGUAGE_RETRIEVE_SUCCESS.value,
+                "languages": languages_data
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error in get_grouped_languages: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ResponseSignal.LANGUAGE_RETRIEVE_ERROR.value
+        )
 
 @language_router.get("/{language_id}", response_model=LanguageResponse)
 async def get_language(
@@ -56,6 +110,7 @@ async def get_language(
     """
     Get a specific language entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(language_id)
     except Exception:
@@ -65,17 +120,26 @@ async def get_language(
         )
         
     language = await language_service.get_language(
-        user_id=current_user.id,
+        user_id=user_id,
         language_id=obj_id
     )
     
     if not language:
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=ResponseSignal.LANGUAGE_NOT_FOUND.value
+            content={
+                "signal": ResponseSignal.LANGUAGE_NOT_FOUND.value,
+                "language": None
+            }
         )
-        
-    return language
+    language_data = BaseController().get_json_serializable_object(language)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "signal": ResponseSignal.LANGUAGE_RETRIEVE_SUCCESS.value,
+            "language": language_data
+        }
+    )
 
 @language_router.put("/{language_id}", response_model=LanguageResponse)
 async def update_language(
@@ -87,6 +151,7 @@ async def update_language(
     """
     Update a specific language entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(language_id)
     except Exception:
@@ -96,12 +161,26 @@ async def update_language(
         )
         
     updated_language = await language_service.update_language(
-        user_id=current_user.id,
+        user_id=user_id,
         language_id=obj_id,
         update_data=update_data
     )
-    
-    return updated_language
+    if not updated_language:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "signal": ResponseSignal.LANGUAGE_NOT_FOUND.value,
+                "language": None
+            }
+        )
+    language_data = BaseController().get_json_serializable_object(updated_language)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "signal": ResponseSignal.LANGUAGE_UPDATE_SUCCESS.value,
+            "language": language_data
+        }
+    )
 
 @language_router.delete("/{language_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_language(
@@ -112,6 +191,7 @@ async def delete_language(
     """
     Delete a specific language entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(language_id)
     except Exception:
@@ -121,12 +201,22 @@ async def delete_language(
         )
         
     result = await language_service.delete_language(
-        user_id=current_user.id,
+        user_id=user_id,
         language_id=obj_id
     )
     
     if not result:
-        raise HTTPException(
+            return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=ResponseSignal.LANGUAGE_NOT_FOUND.value
-        ) 
+            content={
+                "signal": ResponseSignal.LANGUAGE_NOT_FOUND.value,
+                "language": None
+            }
+        )
+    return JSONResponse(
+        status_code=status.HTTP_204_NO_CONTENT,
+        content={
+            "signal": ResponseSignal.LANGUAGE_DELETE_SUCCESS.value,
+            "language": None
+        }
+    )

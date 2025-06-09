@@ -10,6 +10,7 @@ from dto.skill import SkillCreate, SkillUpdate, SkillResponse, SkillsGroupRespon
 import logging
 from dependencies import get_db_client
 from fastapi import Depends
+from core.utils import prepare_skill_for_response, prepare_skills_for_response
 
 class SkillService(BaseService):
     def __init__(self, db_client: object):
@@ -17,6 +18,7 @@ class SkillService(BaseService):
         self.collection = self.db_client[DataBaseCollectionNames.SKILLS.value]
         self.logger = logging.getLogger(__name__)
 
+    
     async def create_skills(
         self, 
         user_id: ObjectId, 
@@ -34,13 +36,14 @@ class SkillService(BaseService):
             # Insert multiple skills
             if skills_to_insert:
                 result = await self.collection.insert_many(skills_to_insert)
-                
                 # Retrieve inserted skills
                 created_skills = await self.collection.find(
                     {"_id": {"$in": result.inserted_ids}}
                 ).to_list(None)
                 
-                return [SkillResponse(**skill) for skill in created_skills]
+                # Prepare skills for response DTOs
+                prepared_skills = prepare_skills_for_response(created_skills)
+                return [SkillResponse(**skill) for skill in prepared_skills]
             
             return []
 
@@ -57,7 +60,10 @@ class SkillService(BaseService):
                 {"user_id": user_id}
             ).sort("name", 1).to_list(None)
             
-            return [SkillResponse(**skill) for skill in skills]
+            # Prepare skills for response DTOs
+            prepared_skills = prepare_skills_for_response(skills)
+            
+            return [SkillResponse(**skill) for skill in prepared_skills]
 
         except Exception as e:
             self.logger.error(f"Error in get_user_skills: {str(e)}")
@@ -79,8 +85,11 @@ class SkillService(BaseService):
             
             if not skill:
                 raise HTTPException(status_code=404, detail="Skill not found")
+            
+            # Prepare skill for response DTO
+            prepared_skill = prepare_skill_for_response(skill)
                 
-            return SkillResponse(**skill)
+            return SkillResponse(**prepared_skill)
 
         except Exception as e:
             self.logger.error(f"Error in get_skill: {str(e)}")
@@ -120,7 +129,11 @@ class SkillService(BaseService):
 
             # Get updated skill
             updated_skill = await self.collection.find_one({"_id": skill_id})
-            return SkillResponse(**updated_skill)
+            
+            # Prepare skill for response DTO
+            prepared_skill = prepare_skill_for_response(updated_skill)
+            
+            return SkillResponse(**prepared_skill)
 
         except Exception as e:
             self.logger.error(f"Error in update_skill: {str(e)}")

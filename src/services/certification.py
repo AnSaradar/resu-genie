@@ -10,6 +10,7 @@ from dto.certification import CertificationCreate, CertificationUpdate, Certific
 import logging
 from dependencies import get_db_client
 from fastapi import Depends
+from core.utils import convert_dates_for_storage_certification, prepare_certifications_for_response, prepare_certification_for_response
 
 
 class CertificationService(BaseService):
@@ -28,6 +29,7 @@ class CertificationService(BaseService):
             certifications_to_insert = []
             for cert_data in certifications_data:
                 cert_dict = cert_data.model_dump(exclude_unset=True)
+                cert_dict = convert_dates_for_storage_certification(cert_dict)
                 cert_dict["user_id"] = user_id
                 cert_dict["created_at"] = datetime.utcnow()
                 certifications_to_insert.append(cert_dict)
@@ -41,7 +43,8 @@ class CertificationService(BaseService):
                     {"_id": {"$in": result.inserted_ids}}
                 ).to_list(None)
                 
-                return [CertificationResponse(**cert) for cert in created_certifications]
+                prepared_certifications = prepare_certifications_for_response(created_certifications)
+                return [CertificationResponse(**cert) for cert in prepared_certifications]
             
             return []
 
@@ -55,10 +58,12 @@ class CertificationService(BaseService):
     async def get_user_certifications(self, user_id: ObjectId) -> List[CertificationResponse]:
         try:
             certifications = await self.collection.find(
-                {"user_id": user_id}
+                {"user_id": user_id}    
             ).sort("issue_date", -1).to_list(None)
             
-            return [CertificationResponse(**cert) for cert in certifications]
+            prepared_certifications = prepare_certifications_for_response(certifications)
+
+            return [CertificationResponse(**cert) for cert in prepared_certifications]
 
         except Exception as e:
             self.logger.error(f"Error in get_user_certifications: {str(e)}")
@@ -81,7 +86,8 @@ class CertificationService(BaseService):
             if not certification:
                 raise HTTPException(status_code=404, detail="Certification not found")
                 
-            return CertificationResponse(**certification)
+            prepared_certification = prepare_certification_for_response(certification)
+            return CertificationResponse(**prepared_certification)
 
         except Exception as e:
             self.logger.error(f"Error in get_certification: {str(e)}")
@@ -121,7 +127,8 @@ class CertificationService(BaseService):
 
             # Get updated certification
             updated_cert = await self.collection.find_one({"_id": certification_id})
-            return CertificationResponse(**updated_cert)
+            prepared_certification = prepare_certification_for_response(updated_cert)
+            return CertificationResponse(**prepared_certification)
 
         except Exception as e:
             self.logger.error(f"Error in update_certification: {str(e)}")

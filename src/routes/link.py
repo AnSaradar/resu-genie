@@ -6,10 +6,15 @@ from dto.link import LinkCreate, LinkUpdate, LinkResponse
 from dependencies.auth import get_current_user
 from schemas.user import User
 from enums import ResponseSignal
+import logging
+from fastapi.responses import JSONResponse
+from controllers.BaseController import BaseController
+
+logger = logging.getLogger(__name__)
 
 link_router = APIRouter(
-    prefix="/links",
-    tags=["links"],
+    prefix="/api/v1/link",
+    tags=["Link" , "api_v1"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -22,10 +27,27 @@ async def create_links(
     """
     Create multiple link entries for the current user.
     """
-    return await link_service.create_links(
-        user_id=current_user.id,
+    user_id = current_user["_id"]
+    try:
+        created_links = await link_service.create_links(
+        user_id=user_id,
         links_data=links
     )
+        prepared_links = BaseController().get_json_serializable_object(created_links)
+        return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={
+            "signal": ResponseSignal.LINK_CREATE_SUCCESS.value,
+            "links": prepared_links
+        }
+    )
+
+    except Exception as e:
+        logger.error(f"Error in create_links: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ResponseSignal.LINK_CREATE_ERROR.value
+        )
 
 @link_router.get("/", response_model=List[LinkResponse])
 async def get_user_links(
@@ -35,7 +57,23 @@ async def get_user_links(
     """
     Get all link entries for the current user.
     """
-    return await link_service.get_user_links(user_id=current_user.id)
+    user_id = current_user["_id"]
+    try:
+        links = await link_service.get_user_links(user_id=user_id)
+        prepared_links = BaseController().get_json_serializable_object(links)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "signal": ResponseSignal.LINK_RETRIEVE_SUCCESS.value,
+                "links": prepared_links
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error in get_user_links: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ResponseSignal.LINK_RETRIEVE_ERROR.value
+        )
 
 @link_router.get("/{link_id}", response_model=LinkResponse)
 async def get_link(
@@ -46,6 +84,7 @@ async def get_link(
     """
     Get a specific link entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(link_id)
     except Exception:
@@ -55,7 +94,7 @@ async def get_link(
         )
         
     link = await link_service.get_link(
-        user_id=current_user.id,
+        user_id=user_id,
         link_id=obj_id
     )
     
@@ -65,7 +104,14 @@ async def get_link(
             detail=ResponseSignal.LINK_NOT_FOUND.value
         )
         
-    return link
+    prepared_link = BaseController().get_json_serializable_object(link)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "signal": ResponseSignal.LINK_RETRIEVE_SUCCESS.value,
+            "link": prepared_link
+        }
+    )
 
 @link_router.put("/{link_id}", response_model=LinkResponse)
 async def update_link(
@@ -77,6 +123,7 @@ async def update_link(
     """
     Update a specific link entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(link_id)
     except Exception:
@@ -86,12 +133,19 @@ async def update_link(
         )
         
     updated_link = await link_service.update_link(
-        user_id=current_user.id,
+        user_id=user_id,
         link_id=obj_id,
         update_data=update_data
     )
     
-    return updated_link
+    prepared_link = BaseController().get_json_serializable_object(updated_link)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "signal": ResponseSignal.LINK_UPDATE_SUCCESS.value,
+            "link": prepared_link
+        }
+    )
 
 @link_router.delete("/{link_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_link(
@@ -102,6 +156,7 @@ async def delete_link(
     """
     Delete a specific link entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(link_id)
     except Exception:
@@ -111,7 +166,7 @@ async def delete_link(
         )
         
     result = await link_service.delete_link(
-        user_id=current_user.id,
+        user_id=user_id,
         link_id=obj_id
     )
     
@@ -120,3 +175,9 @@ async def delete_link(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=ResponseSignal.LINK_NOT_FOUND.value
         )
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "signal": ResponseSignal.LINK_DELETE_SUCCESS.value,
+        }
+    )

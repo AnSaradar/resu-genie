@@ -6,10 +6,16 @@ from dto.skill import SkillCreate, SkillUpdate, SkillResponse, SkillsGroupRespon
 from dependencies.auth import get_current_user
 from schemas.user import User
 from enums import ResponseSignal
+from controllers.BaseController import BaseController
+from fastapi.responses import JSONResponse
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 skill_router = APIRouter(
-    prefix="/skills",
-    tags=["skills"],
+    prefix="/api/v1/skill",
+    tags=["api_v1", "skill"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -22,10 +28,26 @@ async def create_skills(
     """
     Create multiple skill entries for the current user.
     """
-    return await skill_service.create_skills(
-        user_id=current_user.id,
-        skills_data=skills
-    )
+    user_id = current_user["_id"]
+    try:    
+        created_skills = await skill_service.create_skills(
+            user_id=user_id,
+            skills_data=skills
+        )
+        skills_data = BaseController().get_json_serializable_object(created_skills)
+        return JSONResponse(
+            status_code=status.HTTP_201_CREATED,
+            content={
+                "signal": ResponseSignal.SKILL_CREATE_SUCCESS.value,
+                "skills": skills_data
+            }
+        )
+    except Exception as e: 
+        logger.error(f"Error in create_skills: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ResponseSignal.SKILL_CREATE_ERROR.value
+        )
 
 @skill_router.get("/", response_model=List[SkillResponse])
 async def get_user_skills(
@@ -35,7 +57,23 @@ async def get_user_skills(
     """
     Get all skill entries for the current user.
     """
-    return await skill_service.get_user_skills(user_id=current_user.id)
+    user_id = current_user["_id"]
+    try:
+        user_skills = await skill_service.get_user_skills(user_id=user_id)
+        skills_data = BaseController().get_json_serializable_object(user_skills)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "signal": ResponseSignal.SKILL_RETRIEVE_SUCCESS.value,
+                "skills": skills_data
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error in get_user_skills: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ResponseSignal.SKILL_RETRIEVE_ERROR.value
+        )
 
 @skill_router.get("/grouped", response_model=List[SkillsGroupResponse])
 async def get_grouped_skills(
@@ -45,7 +83,24 @@ async def get_grouped_skills(
     """
     Get all skills for the current user, grouped by proficiency level.
     """
-    return await skill_service.group_skills_by_proficiency(user_id=current_user.id)
+    user_id = current_user["_id"]
+    try:
+        grouped_skills = await skill_service.group_skills_by_proficiency(user_id=user_id)
+        grouped_skills_data = BaseController().get_json_serializable_object(grouped_skills)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+                content={
+                "signal": ResponseSignal.SKILL_RETRIEVE_SUCCESS.value,
+                "skills": grouped_skills_data
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error in get_grouped_skills: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ResponseSignal.SKILL_RETRIEVE_ERROR.value
+        )
+
 
 @skill_router.get("/{skill_id}", response_model=SkillResponse)
 async def get_skill(
@@ -56,6 +111,7 @@ async def get_skill(
     """
     Get a specific skill entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(skill_id)
     except Exception:
@@ -65,10 +121,18 @@ async def get_skill(
         )
         
     skill = await skill_service.get_skill(
-        user_id=current_user.id,
+        user_id=user_id,
         skill_id=obj_id
     )
-    
+    skill_data = BaseController().get_json_serializable_object(skill)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "signal": ResponseSignal.SKILL_RETRIEVE_SUCCESS.value,
+            "skill": skill_data
+        }
+    )   
+
     if not skill:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -87,6 +151,7 @@ async def update_skill(
     """
     Update a specific skill entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(skill_id)
     except Exception:
@@ -96,12 +161,18 @@ async def update_skill(
         )
         
     updated_skill = await skill_service.update_skill(
-        user_id=current_user.id,
+        user_id=user_id,
         skill_id=obj_id,
         update_data=update_data
     )
-    
-    return updated_skill
+    skill_data = BaseController().get_json_serializable_object(updated_skill)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "signal": ResponseSignal.SKILL_UPDATE_SUCCESS.value,
+            "skill": skill_data
+        }
+    )
 
 @skill_router.delete("/{skill_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_skill(
@@ -112,6 +183,7 @@ async def delete_skill(
     """
     Delete a specific skill entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(skill_id)
     except Exception:
@@ -121,7 +193,7 @@ async def delete_skill(
         )
         
     result = await skill_service.delete_skill(
-        user_id=current_user.id,
+        user_id=user_id,
         skill_id=obj_id
     )
     
@@ -130,3 +202,9 @@ async def delete_skill(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=ResponseSignal.SKILL_NOT_FOUND.value
         ) 
+    return JSONResponse(
+        status_code=status.HTTP_204_NO_CONTENT,
+        content={
+            "signal": ResponseSignal.SKILL_DELETE_SUCCESS.value
+        }
+    )

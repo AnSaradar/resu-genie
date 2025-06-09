@@ -10,6 +10,7 @@ from dto.link import LinkCreate, LinkUpdate, LinkResponse
 import logging
 from dependencies import get_db_client
 from fastapi import Depends
+from core.utils import prepare_links_for_response, prepare_link_for_response
 
 class LinkService(BaseService):
     def __init__(self, db_client: object):
@@ -40,7 +41,8 @@ class LinkService(BaseService):
                     {"_id": {"$in": result.inserted_ids}}
                 ).to_list(None)
                 
-                return [LinkResponse(**link) for link in created_links]
+                prepared_links = prepare_links_for_response(created_links)
+                return [LinkResponse(**link) for link in prepared_links]
             
             return []
 
@@ -57,7 +59,8 @@ class LinkService(BaseService):
                 {"user_id": user_id}
             ).sort("website_name", 1).to_list(None)
             
-            return [LinkResponse(**link) for link in links]
+            prepared_links = prepare_links_for_response(links)
+            return [LinkResponse(**link) for link in prepared_links]
 
         except Exception as e:
             self.logger.error(f"Error in get_user_links: {str(e)}")
@@ -80,7 +83,8 @@ class LinkService(BaseService):
             if not link:
                 raise HTTPException(status_code=404, detail="Link not found")
                 
-            return LinkResponse(**link)
+            prepared_link = prepare_link_for_response(link)
+            return LinkResponse(**prepared_link)
 
         except Exception as e:
             self.logger.error(f"Error in get_link: {str(e)}")
@@ -120,7 +124,8 @@ class LinkService(BaseService):
 
             # Get updated link
             updated_link = await self.collection.find_one({"_id": link_id})
-            return LinkResponse(**updated_link)
+            prepared_link = prepare_link_for_response(updated_link)
+            return LinkResponse(**prepared_link)
 
         except Exception as e:
             self.logger.error(f"Error in update_link: {str(e)}")

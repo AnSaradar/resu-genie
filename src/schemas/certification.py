@@ -9,8 +9,10 @@ class Certification(BaseModel):
     name: str = Field(..., description="Name of the certification")
     issuing_organization: str = Field(..., description="Organization that issued the certification")
     issue_date: date = Field(..., description="Date when the certification was issued")
-    # TODO: Add a field for the certification URL, Description
+    certificate_url: Optional[str] = Field(None, description="URL of the certification")
+    description: Optional[str] = Field(None, description="Description of the certification")
     
+
     class Config:
         populate_by_name = True
         arbitrary_types_allowed = True

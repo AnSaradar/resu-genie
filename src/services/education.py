@@ -1,17 +1,17 @@
 from typing import List, Optional
 from bson import ObjectId
 from fastapi import HTTPException
-from datetime import datetime
+from datetime import datetime, date
 from motor.motor_asyncio import AsyncIOMotorClient
 from core.config import get_settings
 from enums import DataBaseCollectionNames, ResponseSignal
 from .base import BaseService
 from schemas.education import Education
-from dto.education import EducationCreate, EducationUpdate
+from dto.education import EducationCreate, EducationUpdate, EducationResponse
 import logging
 from dependencies import get_db_client
 from fastapi import Depends
-
+from core.utils import convert_dates_for_storage, prepare_education_for_response, prepare_educations_for_response
 
 class EducationService(BaseService):
     def __init__(self, db_client: object):
@@ -23,12 +23,13 @@ class EducationService(BaseService):
         self, 
         user_id: ObjectId, 
         educations_data: List[EducationCreate]
-    ) -> List[Education]:
+    ) -> List[EducationResponse]:
         try:
             # Prepare educations for insertion
             educations_to_insert = []
             for edu_data in educations_data:
                 edu_dict = edu_data.model_dump(exclude_unset=True)
+                edu_dict = convert_dates_for_storage(edu_dict)
                 edu_dict["user_id"] = user_id
                 edu_dict["created_at"] = datetime.utcnow()
                 educations_to_insert.append(edu_dict)
@@ -42,7 +43,10 @@ class EducationService(BaseService):
                     {"_id": {"$in": result.inserted_ids}}
                 ).to_list(None)
                 
-                return [Education(**edu) for edu in created_educations]
+                # Prepare educations for response DTOs
+                prepared_educations = prepare_educations_for_response(created_educations)
+                print("prepared_educations: from service " + str(prepared_educations))
+                return [EducationResponse(**edu) for edu in prepared_educations]
             
             return []
 
@@ -53,15 +57,18 @@ class EducationService(BaseService):
                 detail=ResponseSignal.EDUCATION_CREATE_ERROR.value
             )
 
-    async def get_user_educations(self, user_id: ObjectId) -> List[Education]:
+    async def get_user_educations(self, user_id: ObjectId) -> List[EducationResponse]:
         try:
             educations = await self.collection.find(
                 {"user_id": user_id}
             ).sort("start_date", -1).to_list(None)
             
-            return [Education(**edu) for edu in educations]
+            # Prepare educations for response DTOs
+            prepared_educations = prepare_educations_for_response(educations)
+            
+            return [EducationResponse(**edu) for edu in prepared_educations]
 
-        except Exception as e:
+        except Exception as e:  
             self.logger.error(f"Error in get_user_educations: {str(e)}")
             raise HTTPException(
                 status_code=400, 
@@ -72,7 +79,7 @@ class EducationService(BaseService):
         self, 
         user_id: ObjectId, 
         education_id: ObjectId
-    ) -> Optional[Education]:
+    ) -> Optional[EducationResponse]:
         try:
             education = await self.collection.find_one({
                 "_id": education_id,
@@ -81,8 +88,11 @@ class EducationService(BaseService):
             
             if not education:
                 raise HTTPException(status_code=404, detail="Education not found")
-                
-            return Education(**education)
+            
+            # Prepare education for response DTO
+            prepared_education = prepare_education_for_response(education)
+            
+            return EducationResponse(**prepared_education)
 
         except Exception as e:
             self.logger.error(f"Error in get_education: {str(e)}")
@@ -96,7 +106,7 @@ class EducationService(BaseService):
         user_id: ObjectId,
         education_id: ObjectId, 
         update_data: EducationUpdate
-    ) -> Education:
+    ) -> EducationResponse:
         try:
             # Check if education exists and belongs to user
             existing_edu = await self.collection.find_one({
@@ -109,8 +119,9 @@ class EducationService(BaseService):
 
             # Prepare update data
             update_dict = update_data.model_dump(exclude_unset=True)
+            update_dict = convert_dates_for_storage(update_dict)
             update_dict["updated_at"] = datetime.utcnow()
-
+            
             # Update education
             result = await self.collection.update_one(
                 {"_id": education_id},
@@ -122,7 +133,11 @@ class EducationService(BaseService):
 
             # Get updated education
             updated_edu = await self.collection.find_one({"_id": education_id})
-            return Education(**updated_edu)
+            
+            # Prepare education for response DTO
+            prepared_education = prepare_education_for_response(updated_edu)
+            
+            return EducationResponse(**prepared_education)
 
         except Exception as e:
             self.logger.error(f"Error in update_education: {str(e)}")

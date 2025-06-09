@@ -10,6 +10,7 @@ from dto.language import LanguageCreate, LanguageUpdate, LanguageResponse, Langu
 import logging
 from dependencies import get_db_client
 from fastapi import Depends
+from core.utils import prepare_language_for_response, prepare_languages_for_response
 
 class LanguageService(BaseService):
     def __init__(self, db_client: object):
@@ -39,8 +40,10 @@ class LanguageService(BaseService):
                 created_languages = await self.collection.find(
                     {"_id": {"$in": result.inserted_ids}}
                 ).to_list(None)
-                
-                return [LanguageResponse(**language) for language in created_languages]
+
+                # Prepare languages for response DTOs
+                prepared_languages = prepare_languages_for_response(created_languages)
+                return [LanguageResponse(**language) for language in prepared_languages]
             
             return []
 
@@ -57,7 +60,9 @@ class LanguageService(BaseService):
                 {"user_id": user_id}
             ).sort("name", 1).to_list(None)
             
-            return [LanguageResponse(**language) for language in languages]
+            # Prepare languages for response DTOs
+            prepared_languages = prepare_languages_for_response(languages)
+            return [LanguageResponse(**language) for language in prepared_languages]
 
         except Exception as e:
             self.logger.error(f"Error in get_user_languages: {str(e)}")
@@ -80,7 +85,7 @@ class LanguageService(BaseService):
             if not language:
                 raise HTTPException(status_code=404, detail="Language not found")
                 
-            return LanguageResponse(**language)
+            return LanguageResponse(**prepare_language_for_response(language))
 
         except Exception as e:
             self.logger.error(f"Error in get_language: {str(e)}")
@@ -120,7 +125,7 @@ class LanguageService(BaseService):
 
             # Get updated language
             updated_language = await self.collection.find_one({"_id": language_id})
-            return LanguageResponse(**updated_language)
+            return LanguageResponse(**prepare_language_for_response(updated_language))
 
         except Exception as e:
             self.logger.error(f"Error in update_language: {str(e)}")

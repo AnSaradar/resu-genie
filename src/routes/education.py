@@ -6,11 +6,15 @@ from dto.education import EducationCreate, EducationUpdate, EducationResponse
 from dependencies import get_current_user
 from schemas.user import User
 from enums import ResponseSignal
+from controllers.BaseController import BaseController
+from fastapi.responses import JSONResponse
+import logging
+
+logger = logging.getLogger(__name__)
 
 education_router = APIRouter(
-    prefix="/education",
-    tags=["education"],
-    responses={404: {"description": "Not found"}},
+    prefix="/api/v1/education",
+    tags=["api_v1","education"],
 )
 
 @education_router.post("/", response_model=List[EducationResponse], status_code=status.HTTP_201_CREATED)
@@ -22,10 +26,28 @@ async def create_educations(
     """
     Create multiple education entries for the current user.
     """
-    return await education_service.create_educations(
-        user_id=current_user.id,
-        educations_data=educations
-    )
+    user_id = current_user["_id"] 
+    try:
+        created_educations = await education_service.create_educations(
+            user_id=user_id,
+            educations_data=educations
+        )
+        
+        educations_data = BaseController().get_json_serializable_object(created_educations)
+        return JSONResponse(
+            status_code=status.HTTP_201_CREATED,
+            content={
+                "signal": ResponseSignal.EDUCATION_CREATE_SUCCESS.value,
+                "educations": educations_data
+            }
+        )   
+    except Exception as e:
+        logger.error(f"Error adding educations: {str(e)}")
+        raise HTTPException(
+            status_code=400, 
+            detail=ResponseSignal.EDUCATION_CREATE_ERROR.value
+        )
+
 
 @education_router.get("/", response_model=List[EducationResponse])
 async def get_user_educations(
@@ -35,8 +57,23 @@ async def get_user_educations(
     """
     Get all education entries for the current user.
     """
-    return await education_service.get_user_educations(user_id=current_user.id)
+    user_id = current_user["_id"]
+    try:
+        user_educations = await education_service.get_user_educations(user_id=user_id)
 
+        educations_data = BaseController().get_json_serializable_object(user_educations)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "signal": ResponseSignal.EDUCATION_RETRIEVE_SUCCESS.value,
+                "educations": educations_data
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, 
+            detail=ResponseSignal.EDUCATION_RETRIEVE_ERROR.value
+        )
 @education_router.get("/{education_id}", response_model=EducationResponse)
 async def get_education(
     education_id: str,
@@ -46,6 +83,7 @@ async def get_education(
     """
     Get a specific education entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(education_id)
     except Exception:
@@ -55,7 +93,7 @@ async def get_education(
         )
         
     education = await education_service.get_education(
-        user_id=current_user.id,
+        user_id=user_id,
         education_id=obj_id
     )
     
@@ -65,8 +103,14 @@ async def get_education(
             detail=ResponseSignal.EDUCATION_NOT_FOUND.value
         )
         
-    return education
-
+    education_data = BaseController().get_json_serializable_object(education)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "signal": ResponseSignal.EDUCATION_RETRIEVE_SUCCESS.value,
+            "education": education_data
+        }
+    )
 @education_router.put("/{education_id}", response_model=EducationResponse)
 async def update_education(
     education_id: str,
@@ -77,6 +121,7 @@ async def update_education(
     """
     Update a specific education entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(education_id)
     except Exception:
@@ -86,13 +131,19 @@ async def update_education(
         )
         
     updated_education = await education_service.update_education(
-        user_id=current_user.id,
+        user_id=user_id,
         education_id=obj_id,
         update_data=update_data
     )
     
-    return updated_education
-
+    education_data = BaseController().get_json_serializable_object(updated_education)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "signal": ResponseSignal.EDUCATION_UPDATE_SUCCESS.value,
+            "education": education_data
+        }
+    )
 @education_router.delete("/{education_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_education(
     education_id: str,
@@ -102,6 +153,7 @@ async def delete_education(
     """
     Delete a specific education entry by ID.
     """
+    user_id = current_user["_id"]
     try:
         obj_id = ObjectId(education_id)
     except Exception:
@@ -111,12 +163,17 @@ async def delete_education(
         )
         
     result = await education_service.delete_education(
-        user_id=current_user.id,
+        user_id=user_id,
         education_id=obj_id
     )
-    
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=ResponseSignal.EDUCATION_NOT_FOUND.value
         )
+    return JSONResponse(
+        status_code=status.HTTP_204_NO_CONTENT,
+        content={
+            "signal": ResponseSignal.EDUCATION_DELETE_SUCCESS.value
+        }
+    )

@@ -1,15 +1,21 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from core.config import  get_settings
 import logging
+from fastapi import Request
+
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-def get_db_client():
+def get_db_client(request: Request):
+    """
+    FastAPI dependency that returns the MongoDB database client
+    established during app startup, avoiding new connections per request.
+    """
     try:
-        mongo_conn = AsyncIOMotorClient(settings.MONGODB_URL)
-        db_client = mongo_conn[settings.MONGODB_DATABASE]
-        logger.info(f"Connected to MongoDB Atlas")
+        # Use the database client established during startup
+        db_client = request.app.db_client
         return db_client
     except Exception as e:
-        logger.error(f"Error connecting to MongoDB: {str(e)}")
+        logger.error(f"Error accessing MongoDB client: {str(e)}")
+        raise e
