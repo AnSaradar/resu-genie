@@ -16,6 +16,12 @@ class LLMInterface(ABC):
         pass
     
     @abstractmethod
+    def generate_json_response(self, prompt : str, chat_history : list = [], max_output_tokens : int = None,
+                              temperature : float = None) -> dict:
+        """Generate a structured JSON response from the LLM"""
+        pass
+    
+    @abstractmethod
     def embed_text(self, text : str, document_type : str = None):
         pass
 

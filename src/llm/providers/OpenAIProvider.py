@@ -2,6 +2,7 @@ from ..LLMInterface import LLMInterface
 from ..LLMEnums import OpenAIEnums
 from openai import OpenAI
 import logging
+import json
 
 class OpenAIProvider(LLMInterface):
 
@@ -92,6 +93,57 @@ class OpenAIProvider(LLMInterface):
             
         except Exception as e:
             self.logger.error(f"Error generating text with OpenAI: {str(e)}")
+            raise e
+
+    def generate_json_response(self, prompt: str, chat_history: list=[], max_output_tokens: int=None,
+                              temperature: float = None) -> dict:
+        """Generate a structured JSON response using OpenAI's response_format parameter"""
+        
+        if not self.client:
+            self.logger.error("OpenAI client was not set")
+            raise Exception("OpenAI client not initialized")
+
+        if not self.generation_model_id:
+            self.logger.error("Generation model for OpenAI was not set")
+            raise Exception("Generation model not set")
+        
+        max_output_tokens = max_output_tokens if max_output_tokens else self.default_generation_max_output_tokens
+        temperature = temperature if temperature else self.default_generation_temperature
+
+        # Create a copy of chat history to avoid modifying the original
+        messages = chat_history.copy()
+        messages.append(
+            self.construct_prompt(prompt=prompt, role=OpenAIEnums.USER.value)
+        )
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.generation_model_id,
+                messages=messages,
+                max_tokens=max_output_tokens,
+                temperature=temperature,
+                response_format={"type": "json_object"}  # Force JSON response
+            )
+            
+            self.logger.info(f"JSON response generated successfully")
+            
+            if not response or not response.choices or len(response.choices) == 0:
+                self.logger.error("Empty response from OpenAI")
+                raise Exception("Empty response from OpenAI")
+            
+            # Parse the JSON response
+            json_content = response.choices[0].message.content
+            if not json_content:
+                raise Exception("Empty JSON content from OpenAI")
+                
+            try:
+                return json.loads(json_content)
+            except json.JSONDecodeError as e:
+                self.logger.error(f"Failed to parse JSON response: {json_content}")
+                raise Exception(f"Invalid JSON response from OpenAI: {str(e)}")
+            
+        except Exception as e:
+            self.logger.error(f"Error generating JSON response with OpenAI: {str(e)}")
             raise e
 
     def embed_text(self, text: str, document_type: str = None):
