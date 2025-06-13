@@ -11,6 +11,7 @@ from dto.skill import SkillResponse
 from dto.certification import CertificationResponse
 from dto.language import LanguageResponse
 from dto.link import LinkResponse
+from dto.personal_project import PersonalProjectResponse
 # class PersonalInfo(BaseModel):
 #     name: str = Field(..., description="Full name of the individual")
 #     email: EmailStr = Field(..., description="Email address")
@@ -93,7 +94,7 @@ class Resume(BaseModel):
     certifications: Optional[List[CertificationResponse]] = Field(None, description="List of certifications")
     languages: List[LanguageResponse] = Field(..., description="List of languages known")
     personal_links: Optional[List[LinkResponse]] = Field(None, description="List of presonal links")
-    personal_projects: Optional[List] = Field(None, description="List of presonal projects")
+    personal_projects: Optional[List[PersonalProjectResponse]] = Field(None, description="List of personal projects")
     class Config:
         populate_by_name = True
         arbitrary_types_allowed = True
