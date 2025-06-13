@@ -150,3 +150,49 @@ def prepare_link_for_response(link_dict: dict) -> dict:
 def prepare_links_for_response(links: List[dict]) -> List[dict]:
     """Prepare multiple links for response DTOs"""
     return [prepare_link_for_response(link) for link in links]
+
+
+#personal_project
+def convert_dates_for_storage_personal_project(data_dict: dict) -> dict:
+    """Convert date objects to datetime objects for MongoDB storage"""
+    # Handle start_date (optional field)
+    if 'start_date' in data_dict and data_dict['start_date'] is not None:
+        data_dict["start_date"] = datetime.combine(data_dict["start_date"], datetime.min.time())
+    
+    # Handle end_date (optional field - can be None)
+    if 'end_date' in data_dict and data_dict['end_date'] is not None:
+        data_dict["end_date"] = datetime.combine(data_dict["end_date"], datetime.min.time())
+    
+    return data_dict
+
+def prepare_personal_project_for_response(project_dict: dict) -> dict:
+    """Convert datetime back to date and add computed fields for response DTOs"""
+    # Convert ObjectId to string for response DTO
+    if '_id' in project_dict and project_dict['_id'] is not None:
+        project_dict['_id'] = str(project_dict['_id'])
+    
+    # Convert datetime back to date for response
+    if 'start_date' in project_dict and project_dict['start_date'] is not None and isinstance(project_dict['start_date'], datetime):
+        project_dict['start_date'] = project_dict['start_date'].date()
+    if 'end_date' in project_dict and project_dict['end_date'] is not None and isinstance(project_dict['end_date'], datetime):
+        project_dict['end_date'] = project_dict['end_date'].date()
+    
+    # Add computed duration field that PersonalProjectResponse expects
+    if project_dict.get('start_date') and project_dict.get('end_date'):
+        if project_dict.get('is_ongoing', False):
+            project_dict['duration'] = f"From {project_dict['start_date']} to Present"
+        else:
+            project_dict['duration'] = f"From {project_dict['start_date']} to {project_dict['end_date']}"
+    elif project_dict.get('start_date'):
+        if project_dict.get('is_ongoing', False):
+            project_dict['duration'] = f"From {project_dict['start_date']} to Present"
+        else:
+            project_dict['duration'] = f"Started on {project_dict['start_date']}"
+    else:
+        project_dict['duration'] = None
+    
+    return project_dict
+
+def prepare_personal_projects_for_response(projects: List[dict]) -> List[dict]:
+    """Prepare multiple personal projects for response DTOs"""
+    return [prepare_personal_project_for_response(project) for project in projects]

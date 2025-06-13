@@ -11,4 +11,5 @@ class DataBaseCollectionNames(Enum):
     LINKS = "links"
     EVALUATIONS = "evaluations"
     COMPLETE_EVALUATIONS = "complete_evaluations"
+    PERSONAL_PROJECTS = "personal_projects"
     

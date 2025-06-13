@@ -96,3 +96,14 @@ class ResponseSignal(Enum):
     EVALUATION_RETRIEVE_ERROR = "Error retrieving evaluation"
     EVALUATION_HISTORY_SUCCESS = "Evaluation history retrieved successfully"
     EVALUATION_HISTORY_ERROR = "Error retrieving evaluation history"
+
+    # Personal Project related signals
+    PERSONAL_PROJECT_CREATE_ERROR = "Error while adding new personal project entries"
+    PERSONAL_PROJECT_RETRIEVE_ERROR = "Error while retrieving personal project data"
+    PERSONAL_PROJECT_UPDATE_ERROR = "Error while updating personal project entry"
+    PERSONAL_PROJECT_DELETE_ERROR = "Error while deleting personal project entry"
+    PERSONAL_PROJECT_NOT_FOUND = "Personal project entry not found"
+    PERSONAL_PROJECT_CREATE_SUCCESS = "Personal Project Added Successfully"
+    PERSONAL_PROJECT_RETRIEVE_SUCCESS = "Personal Project Retrieved Successfully"
+    PERSONAL_PROJECT_UPDATE_SUCCESS = "Personal Project Updated Successfully"
+    PERSONAL_PROJECT_DELETE_SUCCESS = "Personal Project Deleted Successfully"
