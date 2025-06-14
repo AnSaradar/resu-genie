@@ -102,12 +102,45 @@ class ResumeController:
                     country = getattr(exp.location, 'country', '') or ""
                     location_str = f"{city}, {country}".strip(", ")
                 
-                # Process description - ensure it's a list for template consistency
+                # Process description - handle bullet points and sentence splitting
                 details = []
                 if exp.description:
-                    # Split by newlines or bullet points if needed
-                    details = [line.strip() for line in exp.description.split('\n') if line.strip()]
-                    if not details:  # If no newlines, keep as single item
+                    description = exp.description.strip()
+                    
+                    # Check if description already contains bullet points (• or -)
+                    if '•' in description or description.startswith('-'):
+                        # Split by bullet points
+                        if '•' in description:
+                            bullet_items = [item.strip() for item in description.split('•') if item.strip()]
+                        else:
+                            bullet_items = [item.strip() for item in description.split('-') if item.strip()]
+                        
+                        # Clean up each bullet item
+                        for item in bullet_items:
+                            if item:
+                                # Remove leading/trailing spaces and ensure proper punctuation
+                                cleaned_item = item.strip()
+                                if cleaned_item and not cleaned_item.endswith(('.', '!', '?')):
+                                    cleaned_item += '.'
+                                details.append(cleaned_item)
+                    else:
+                        # Split by sentence-ending periods (with space after)
+                        sentences = [s.strip() for s in description.split('. ') if s.strip()]
+                        
+                        # Add period back to sentences (except the last one if it already has one)
+                        for i, sentence in enumerate(sentences):
+                            if i == len(sentences) - 1:
+                                # Last sentence - only add period if it doesn't end with punctuation
+                                if not sentence.endswith(('.', '!', '?', ':')):
+                                    sentence += '.'
+                            else:
+                                # Not last sentence - add period
+                                if not sentence.endswith('.'):
+                                    sentence += '.'
+                            details.append(sentence)
+                    
+                    # If no details were created, keep original description
+                    if not details and exp.description:
                         details = [exp.description]
                 
                 experience_data = {

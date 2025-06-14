@@ -297,6 +297,7 @@
         <!-- Main Content -->
         <div class="main-content">
             <!-- Work Experience -->
+            {% if experience %}
             <section class="section">
                 <h2 class="section-title">Work Experience</h2>
                 {% for job in experience %}
@@ -320,8 +321,10 @@
                 </div>
                 {% endfor %}
             </section>
+            {% endif %}
 
             <!-- Volunteering Section -->
+            {% if volunteering %}
             <section class="section">
                 <h2 class="section-title">Volunteering</h2>
                 {% for job in volunteering %}
@@ -345,8 +348,10 @@
                 </div>
                 {% endfor %}
             </section>
+            {% endif %}
 
             <!-- Education -->
+            {% if education %}
             <section class="section">
                 <h2 class="section-title">Education</h2>
                 {% for edu in education %}
@@ -357,25 +362,31 @@
                 </div>
                 {% endfor %}
             </section>
+            {% endif %}
         </div>
 
         <!-- Sidebar -->
         <div class="sidebar">
             <!-- Stack -->
+            {% if technical_skills %}
             <section class="section">
                 <h2 class="section-title">Technical Stack</h2>
                 <div class="skill-category">
                     <div class="skill-list">{{technical_skills|join(", ")}}</div>
                 </div>
             </section>
+            {% endif %}
 
             <!-- Skills -->
+            {% if soft_skills %}
             <section class="section">
                 <h2 class="section-title">Skills</h2>
                 <div class="skill-list">{{soft_skills|join(", ")}}</div>
             </section>
+            {% endif %}
 
             <!-- Languages -->
+            {% if languages %}
             <section class="section">
                 <h2 class="section-title">Languages</h2>
                 {% for lang in languages %}
@@ -385,6 +396,7 @@
                 </div>
                 {% endfor %}
             </section>
+            {% endif %}
 
             <!-- Certificates -->
             {% if certifications %}
