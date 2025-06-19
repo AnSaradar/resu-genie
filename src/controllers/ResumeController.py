@@ -213,7 +213,7 @@ class ResumeController:
         
         return processed_certs
 
-    def process_languages(self, languages: List[Any]) -> List[Dict[str, str]]:
+    def process_languages(self, languages: List[Any]) -> List[Dict[str, Any]]:
         """Process languages and return list of formatted language data."""
         if not languages:
             return []
@@ -221,9 +221,17 @@ class ResumeController:
         processed_languages = []
         for lang in languages:
             try:
+                # Determine display proficiency
+                proficiency_display = lang.proficiency.value if lang.proficiency else ""
+                
+                # If native, override the proficiency display
+                if getattr(lang, 'is_native', False):
+                    proficiency_display = "Native"
+                
                 lang_data = {
                     "name": lang.name or "",
-                    "proficiency": lang.proficiency.value if lang.proficiency else ""
+                    "proficiency": proficiency_display,
+                    "is_native": getattr(lang, 'is_native', False)
                 }
                 processed_languages.append(lang_data)
                 

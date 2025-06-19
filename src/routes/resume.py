@@ -83,7 +83,7 @@ async def build_resume(resume_data: Resume):
 
 @resume_router.get("/generate")
 async def generate_resume(
-    template_name: str = TemplateEnum.IMAGINE.value,
+    template_name: str = TemplateEnum.JOBSCAN.value,
     current_user: User = Depends(get_current_user),
     user_profile_service: UserProfileService = Depends(get_user_profile_service),
     education_service: EducationService = Depends(get_education_service),

@@ -8,6 +8,7 @@ class LanguageCreate(BaseModel):
     """
     name: str = Field(..., description="Name of the language")
     proficiency: LanguageProficiency = Field(..., description="Proficiency of the language")
+    is_native: Optional[bool] = Field(default=False, description="Whether this is a native language")
 
     class Config:
         from_attributes = True
@@ -18,6 +19,7 @@ class LanguageUpdate(BaseModel):
     """
     name: Optional[str] = Field(None, description="Name of the language")
     proficiency: Optional[LanguageProficiency] = Field(None, description="Proficiency of the language")
+    is_native: Optional[bool] = Field(None, description="Whether this is a native language")
 
     class Config:
         from_attributes = True
@@ -29,6 +31,7 @@ class LanguageResponse(BaseModel):
     id: str = Field(..., alias="_id")
     name: str = Field(..., description="Name of the language")
     proficiency: LanguageProficiency = Field(..., description="Proficiency of the language")
+    is_native: bool = Field(default=False, description="Whether this is a native language")
 
     class Config:
         from_attributes = True

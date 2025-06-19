@@ -30,6 +30,9 @@ class LanguageService(BaseService):
                 language_dict = language_data.model_dump(exclude_unset=True)
                 language_dict["user_id"] = user_id
                 language_dict["created_at"] = datetime.utcnow()
+                # Ensure is_native has a default value
+                if "is_native" not in language_dict:
+                    language_dict["is_native"] = False
                 languages_to_insert.append(language_dict)
 
             # Insert multiple languages
@@ -159,24 +162,30 @@ class LanguageService(BaseService):
     
     async def group_languages_by_proficiency(self, user_id: ObjectId) -> List[LanguagesGroupResponse]:
         """
-        Group user languages by proficiency level
+        Group user languages by proficiency level with native languages prioritized
         """
         try:
             languages = await self.get_user_languages(user_id)
             
-            # Group languages by proficiency
+            # Separate native and non-native languages
+            native_languages = [lang for lang in languages if lang.is_native]
+            non_native_languages = [lang for lang in languages if not lang.is_native]
+            
+            # Group non-native languages by proficiency
             grouped_languages = {}
             
-            # Define proficiency order for sorting
+            # Define proficiency order for sorting (fixed the enum values)
             proficiency_order = {
-                LanguageProficiency.NATIVE.value: 1,
-                LanguageProficiency.FLUENT.value: 2,
-                LanguageProficiency.ADVANCED.value: 3,
-                LanguageProficiency.INTERMEDIATE.value: 4,
-                LanguageProficiency.BASIC.value: 5
+                LanguageProficiency.C2.value: 1,
+                LanguageProficiency.C1.value: 2,
+                LanguageProficiency.B2.value: 3,
+                LanguageProficiency.B1.value: 4,
+                LanguageProficiency.A2.value: 5,
+                LanguageProficiency.A1.value: 6
             }
             
-            for language in languages:
+            # Group non-native languages
+            for language in non_native_languages:
                 proficiency = language.proficiency.value
                 
                 if proficiency not in grouped_languages:
@@ -184,16 +193,30 @@ class LanguageService(BaseService):
                     
                 grouped_languages[proficiency].append(language)
             
-            # Convert to response format and sort by proficiency level
+            # Convert to response format
             result = []
+            
+            # Add native languages group first if any
+            if native_languages:
+                result.append(LanguagesGroupResponse(
+                    proficiency_level="Native",
+                    languages=sorted(native_languages, key=lambda x: x.name)
+                ))
+            
+            # Add other proficiency groups
             for proficiency, languages_list in grouped_languages.items():
                 result.append(LanguagesGroupResponse(
                     proficiency_level=proficiency,
                     languages=sorted(languages_list, key=lambda x: x.name)
                 ))
                 
-            # Sort groups by proficiency level (Native first, then Fluent, etc.)
-            result.sort(key=lambda x: proficiency_order.get(x.proficiency_level, 999))
+            # Sort non-native groups by proficiency level (C2 first, then C1, etc.)
+            non_native_groups = [group for group in result if group.proficiency_level != "Native"]
+            non_native_groups.sort(key=lambda x: proficiency_order.get(x.proficiency_level, 999))
+            
+            # Combine: Native first, then sorted proficiency groups
+            native_groups = [group for group in result if group.proficiency_level == "Native"]
+            result = native_groups + non_native_groups
                 
             return result
             

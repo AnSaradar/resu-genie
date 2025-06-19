@@ -8,6 +8,7 @@ class Language(BaseModel):
     user_id: ObjectId
     name : str = Field(..., description="Name of the language")
     proficiency: LanguageProficiency = Field(..., description="Proficiency of the language")
+    is_native: bool = Field(default=False, description="Whether this is a native language")
 
     class Config:
         populate_by_name = True

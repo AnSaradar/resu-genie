@@ -470,7 +470,13 @@
                 {% for lang in languages %}
                 <div class="language-item">
                     <span class="language-name">{{lang.name}}</span>
-                    <span class="language-level">{{lang.proficiency}}</span>
+                    <span class="language-level">
+                        {% if lang.is_native %}
+                            <strong>Native</strong>
+                        {% else %}
+                            {{lang.proficiency}}
+                        {% endif %}
+                    </span>
                 </div>
                 {% endfor %}
             </div>
