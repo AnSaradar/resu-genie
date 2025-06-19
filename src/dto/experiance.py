@@ -37,6 +37,7 @@ class ExperienceUpdate(BaseModel):
         from_attributes = True
 
 class ExperienceResponse(BaseModel):
+    id: str = Field(..., alias="_id")
     title: str
     seniority_level: SeniorityLevel
     company: str
