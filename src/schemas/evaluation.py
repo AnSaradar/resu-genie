@@ -1,12 +1,13 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from bson.objectid import ObjectId
-from enums import EvaluationArea
+from enums import EvaluationArea, EvaluationStatus
 
 class Evaluation(BaseModel):
     id: Optional[ObjectId] = Field(None, alias="_id")
     user_id: ObjectId
     evaluation_area: EvaluationArea
+    status: EvaluationStatus
     score: int = Field(..., ge=1, le=10, description="Evaluation score from 1 to 10")
     message: str = Field(..., description="Short diagnostic summary")
     suggestions: List[str] = Field(..., description="Actionable tips (1-3 recommendations)")

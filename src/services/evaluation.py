@@ -66,6 +66,7 @@ class EvaluationService(BaseService):
                 score=evaluation_data["score"],
                 message=evaluation_data["message"],
                 suggestions=evaluation_data["suggestions"],
+                status=evaluation_data["status"],
                 evaluation_area=EvaluationArea.USER_PROFILE
             )
 
@@ -122,6 +123,7 @@ Experience {i}:
                 score=evaluation_data["score"],
                 message=evaluation_data["message"],
                 suggestions=evaluation_data["suggestions"],
+                status=evaluation_data["status"],
                 evaluation_area=EvaluationArea.EXPERIENCE
             )
 
@@ -177,6 +179,7 @@ Education {i}:
                 score=evaluation_data["score"],
                 message=evaluation_data["message"],
                 suggestions=evaluation_data["suggestions"],
+                status=evaluation_data["status"],
                 evaluation_area=EvaluationArea.EDUCATION
             )
 

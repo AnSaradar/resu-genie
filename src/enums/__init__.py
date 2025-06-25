@@ -2,4 +2,4 @@ from .ResumeEnums import SeniorityLevel, Degree, SkillProficiency, LanguageProfi
 from .ResponseSignalEnum import ResponseSignal
 from .TemplateEnums import TemplateEnum
 from .DataBaseEnums import DataBaseCollectionNames
-from .EvaluationEnums import EvaluationArea
+from .EvaluationEnums import EvaluationArea, EvaluationStatus

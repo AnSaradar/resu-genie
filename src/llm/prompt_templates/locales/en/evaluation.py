@@ -4,73 +4,90 @@ from string import Template
 
 # User Profile Evaluation
 user_profile_evaluation_prompt = Template("""
-You are an ATS and HR expert evaluating a user profile for resume optimization.
+You are an expert in HR and ATS (Applicant Tracking Systems). Your job is to review a user's profile and help improve it for professional and ATS-friendly resumes.
 
-Evaluate this user profile based on:
-1. LinkedIn URL presence and format
-2. Profile summary quality (should contain current job title and services offered)
-3. Current position clarity and relevance
-4. Overall professional presentation
+Please check the following:
+1. Is the LinkedIn URL included and properly formatted?
+2. Is the profile summary clear and does it mention their current job and services?
+3. Is the current position clearly described and relevant to their field?
+4. Does the overall profile look professional?
 
 User Profile Data:
 - LinkedIn URL: $linkedin_url
-- Profile Summary: $profile_summary  
+- Profile Summary: $profile_summary
 - Current Position: $current_position
 - Work Field: $work_field
 - Years of Experience: $years_of_experience
 
-Provide evaluation in this exact JSON format:
+Provide your evaluation using this JSON format:
 {
-  "score": [1-10 integer],
-  "message": "[Short diagnostic summary in 1-2 sentences]",
-  "suggestions": ["[Actionable tip 1]", "[Actionable tip 2]", "[Actionable tip 3]"]
+  "score": [1-10],
+  "status": "[good | warning | critical]",
+  "message": "[Brief summary of what’s working or not]",
+  "suggestions": ["[Simple improvement 1]", "[Simple improvement 2]", "[Simple improvement 3]"]
 }
 
-Focus on ATS compatibility and professional presentation.
-""")
+Status meaning:
+- good: Meets expectations
+- warning: Needs minor improvements
+- critical: Needs major changes
 
+Keep it simple and helpful.
+""")
 # Experience Evaluation  
 experience_evaluation_prompt = Template("""
-You are an ATS and HR expert evaluating work experience entries for resume optimization.
+You are an HR and ATS expert helping users improve their resume experiences.
 
-Evaluate these experiences based on:
-1. Job title clarity and professionalism
-2. Description quality (should be in bullet points showing services/achievements)
-3. Volunteer work motivation (if applicable)
-4. Overall ATS compatibility and impact
+Check the following:
+1. Are job titles clear and professional?
+2. Are descriptions written as bullet points showing what the person did or achieved?
+3. If there is volunteer work, is the motivation clear?
+4. Are the experiences strong and ATS-friendly?
 
 Experience Data:
 $experience_list
 
-Provide evaluation in this exact JSON format:
+Provide your evaluation using this JSON format:
 {
-  "score": [1-10 integer], 
-  "message": "[Short diagnostic summary in 1-2 sentences]",
-  "suggestions": ["[Actionable tip 1]", "[Actionable tip 2]", "[Actionable tip 3]"]
+  "score": [1-10],
+  "status": "[good | warning | critical]",
+  "message": "[Brief summary of what’s working or not]",
+  "suggestions": ["[Simple improvement 1]", "[Simple improvement 2]", "[Simple improvement 3]"]
 }
 
-Focus on quantifiable achievements and ATS keyword optimization.
+Status meaning:
+- good: Strong and clear experience
+- warning: Some small issues
+- critical: Needs major updates
+
+Use easy-to-understand advice and focus on achievements and ATS keywords.
 """)
 
 # Education Evaluation
 education_evaluation_prompt = Template("""
-You are an ATS and HR expert evaluating education entries for resume optimization.
+You are an HR and ATS expert helping users present their education clearly and professionally.
 
-Evaluate these education entries based on:
-1. Institution and degree information completeness
-2. Field of study relevance and clarity  
-3. Description quality and professional presentation
-4. Overall contribution to candidacy
+Check the following:
+1. Is the school and degree info complete?
+2. Is the field of study clear and relevant?
+3. Is the description (if any) written professionally?
+4. Does the education support the person's career goals?
 
 Education Data:
 $education_list
 
-Provide evaluation in this exact JSON format:
+Provide your evaluation using this JSON format:
 {
-  "score": [1-10 integer],
-  "message": "[Short diagnostic summary in 1-2 sentences]", 
-  "suggestions": ["[Actionable tip 1]", "[Actionable tip 2]", "[Actionable tip 3]"]
+  "score": [1-10],
+  "status": "[good | warning | critical]",
+  "message": "[Brief summary of what’s working or not]",
+  "suggestions": ["[Simple improvement 1]", "[Simple improvement 2]", "[Simple improvement 3]"]
 }
 
-Focus on relevance to career goals and professional presentation.
-""") 
+Status meaning:
+- good: Everything looks clear and strong
+- warning: Some info could be clearer
+- critical: Important info is missing or unclear
+
+Keep it short, clear, and useful.
+""")
