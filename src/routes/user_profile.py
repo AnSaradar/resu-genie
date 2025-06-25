@@ -7,6 +7,7 @@ from dto.user_profile import UserProfileCreateUpdate, UserProfileResponse
 from dependencies.auth import get_current_user
 from controllers.BaseController import BaseController
 from typing import List
+import pycountry
 
 logger = logging.getLogger(__name__)
 
@@ -96,3 +97,10 @@ async def get_work_fields():
     Get a list of all available work fields
     """
     return [field.value for field in WorkField]
+
+@user_profile_router.get("/countries", response_model=List[str])
+async def get_countries():
+    """
+    Get a list of all available countries
+    """
+    return [country.name for country in pycountry.countries]

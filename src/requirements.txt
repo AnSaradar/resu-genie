@@ -21,6 +21,7 @@ typing-extensions
 weasyprint
 pyppeteer
 cohere
+pycountry
 
 
 
