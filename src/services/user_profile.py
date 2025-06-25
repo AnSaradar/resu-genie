@@ -2,7 +2,7 @@ from typing import Optional
 from bson import ObjectId
 from fastapi import HTTPException, Depends
 from datetime import datetime
-from enums import DataBaseCollectionNames, WorkField
+from enums import DataBaseCollectionNames, WorkField, SeniorityLevel
 from .base import BaseService
 from schemas.user_profile import UserProfile
 from dto.user_profile import UserProfileResponse
@@ -35,6 +35,10 @@ class UserProfileService(BaseService):
             # Convert WorkField enum to string if it exists
             if profile_dict.get("work_field") and isinstance(profile_dict["work_field"], WorkField):
                 profile_dict["work_field"] = profile_dict["work_field"].value
+                
+            # Convert SeniorityLevel enum to string if it exists
+            if profile_dict.get("current_seniority_level") and isinstance(profile_dict["current_seniority_level"], SeniorityLevel):
+                profile_dict["current_seniority_level"] = profile_dict["current_seniority_level"].value
 
             if existing_profile:
                 # Update existing profile
@@ -103,6 +107,10 @@ class UserProfileService(BaseService):
             if update_dict.get("work_field") and isinstance(update_dict["work_field"], WorkField):
                 update_dict["work_field"] = update_dict["work_field"].value
                 
+            # Convert SeniorityLevel enum to string if it exists
+            if update_dict.get("current_seniority_level") and isinstance(update_dict["current_seniority_level"], SeniorityLevel):
+                update_dict["current_seniority_level"] = update_dict["current_seniority_level"].value
+                
             update_dict["updated_at"] = datetime.utcnow()
 
             # Update profile
@@ -152,6 +160,14 @@ class UserProfileService(BaseService):
             except ValueError:
                 # If the value doesn't match any enum, set to None or OTHER
                 profile["work_field"] = WorkField.OTHER
+                
+        # Convert current_seniority_level string to enum if it exists
+        if "current_seniority_level" in profile and profile["current_seniority_level"] is not None:
+            try:
+                profile["current_seniority_level"] = SeniorityLevel(profile["current_seniority_level"])
+            except ValueError:
+                # If the value doesn't match any enum, set to None
+                profile["current_seniority_level"] = None
         
         return UserProfileResponse(**profile)
 

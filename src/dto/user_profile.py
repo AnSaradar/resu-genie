@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 from datetime import date, datetime
 from schemas.common import Address
-from enums import WorkField
+from enums import WorkField, SeniorityLevel
 
 class UserProfileCreateUpdate(BaseModel):
     linkedin_url: Optional[str] = None
@@ -12,6 +12,7 @@ class UserProfileCreateUpdate(BaseModel):
     address: Optional[Address] = None
     country_of_residence: Optional[str] = None
     current_position: Optional[str] = Field(None, description="Current job position/title")
+    current_seniority_level: Optional[SeniorityLevel] = Field(None, description="Current seniority level")
     work_field: Optional[WorkField] = Field(None, description="Primary field of work")
     years_of_experience: Optional[int] = Field(None, description="Total years of professional experience", ge=0, le=50)
 
@@ -29,6 +30,7 @@ class UserProfileResponse(BaseModel):
     address: Optional[Address] = None
     country_of_residence: Optional[str] = None
     current_position: Optional[str] = Field(None, description="Current job position/title")
+    current_seniority_level: Optional[SeniorityLevel] = Field(None, description="Current seniority level")
     work_field: Optional[WorkField] = Field(None, description="Primary field of work")
     years_of_experience: Optional[int] = Field(None, description="Total years of professional experience")
 

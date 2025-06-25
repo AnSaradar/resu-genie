@@ -32,6 +32,7 @@ async def create_or_update_profile(
     - address: Optional physical address
     - country_of_residence: Optional country of residence
     - current_position: Optional current job title
+    - current_seniority_level: Optional current seniority level
     - work_field: Optional primary field of work
     - years_of_experience: Optional years of professional experience
     """

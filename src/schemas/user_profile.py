@@ -3,7 +3,7 @@ from typing import List, Optional
 from bson.objectid import ObjectId
 from datetime import date, datetime
 from schemas.common import Address
-from enums import WorkField
+from enums import WorkField, SeniorityLevel
 
 class UserProfile(BaseModel):
     id: Optional[ObjectId] = Field(None, alias="_id")
@@ -15,6 +15,7 @@ class UserProfile(BaseModel):
     address: Optional[Address]
     country_of_residence: Optional[str]
     current_position: Optional[str] = Field(None, description="Current job position/title")
+    current_seniority_level: Optional[SeniorityLevel] = Field(None, description="Current seniority level")
     work_field: Optional[WorkField] = Field(None, description="Primary field of work")
     years_of_experience: Optional[int] = Field(None, description="Total years of professional experience", ge=0, le=50)
     

@@ -64,6 +64,7 @@ class ResumeController:
             "website": personal_info.website_url or "" if personal_info else "",
             "summary": personal_info.profile_summary or "" if personal_info else "",
             "work_field": personal_info.work_field.value if personal_info and personal_info.work_field else "",
+            "current_seniority_level": personal_info.current_seniority_level.value if personal_info and personal_info.current_seniority_level else "",
             "years_of_experience": personal_info.years_of_experience or "" if personal_info else "",
             "current_position": personal_info.current_position or "" if personal_info else "",
             **location_info
