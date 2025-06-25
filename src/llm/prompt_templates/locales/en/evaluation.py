@@ -6,11 +6,14 @@ from string import Template
 user_profile_evaluation_prompt = Template("""
 You are an expert in HR and ATS (Applicant Tracking Systems). Your job is to review a user's profile and help improve it for professional and ATS-friendly resumes.
 
-Please check the following:
-1. Is the LinkedIn URL included and properly formatted?
-2. Is the profile summary clear and does it mention their current job and services?
-3. Is the current position clearly described and relevant to their field?
-4. Does the overall profile look professional?
+Please evaluate the following:
+1. **LinkedIn URL**: Is it included and correctly formatted?
+2. **Profile Summary**:
+   - Does the first line mention the user’s specialization, years of experience, and key technologies?
+   - Do lines 2–3 contain 1–2 quantified achievements or impact statements?
+   - Is it professional, clear, and concise?
+3. **Current Position**: Is it clear, relevant to the work field, and presented professionally?
+4. **Overall Profile Presentation**: Does it look polished and aligned with the user's career direction?
 
 User Profile Data:
 - LinkedIn URL: $linkedin_url
