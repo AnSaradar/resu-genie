@@ -12,6 +12,7 @@ class User(BaseModel):
     phone: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     preferred_language: Optional[str] = None
+    is_verified: bool = Field(default=False, description="Email verification status")
 
     class Config:
         populate_by_name = True

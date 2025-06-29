@@ -18,6 +18,24 @@ class ResponseSignal(Enum):
     PHONE_ALREADY_REGISTERED = "Phone number is already registered"
     REGISTRATION_SERVER_ERROR = "Server error during registration"
 
+    # Email verification signals
+    EMAIL_VERIFICATION_REQUIRED = "Email verification required. Please check your email for OTP"
+    EMAIL_VERIFICATION_SUCCESS = "Email verified successfully"
+    EMAIL_VERIFICATION_FAILED = "Email verification failed"
+    EMAIL_NOT_VERIFIED = "Please verify your email before logging in"
+    USER_ALREADY_VERIFIED = "User email is already verified"
+    OTP_RESEND_SUCCESS = "Verification OTP resent successfully"
+    OTP_RESEND_COOLDOWN = "Please wait before requesting another OTP"
+
+    # OTP related signals
+    OTP_SEND_SUCCESS = "OTP sent successfully"
+    OTP_SEND_ERROR = "Error while sending OTP"
+    OTP_VERIFY_SUCCESS = "OTP verified successfully"
+    OTP_VERIFY_ERROR = "Invalid or expired OTP"
+    OTP_EXPIRED = "OTP has expired"
+    OTP_TOO_MANY_ATTEMPTS = "Too many attempts. Please request a new OTP"
+    OTP_EMAIL_SEND_FAILED = "Failed to send OTP email"
+
     # User profile signals
     USER_PROFILE_ERROR = "Error while creating/updating user profile"
     USER_PROFILE_SUCCESS = "User profile created/updated successfully"

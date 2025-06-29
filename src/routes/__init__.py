@@ -10,5 +10,6 @@ from .link import link_router
 from .resume import resume_router
 from .evaluation import evaluation_router
 from .personal_project import personal_project_router
+from .otp import otp_router
 
 

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import base_router, resume_router, auth_router, user_profile_router, experience_router, education_router, skill_router, language_router, certification_router, link_router, evaluation_router, personal_project_router
+from routes import base_router, resume_router, auth_router, user_profile_router, experience_router, education_router, skill_router, language_router, certification_router, link_router, evaluation_router, personal_project_router, otp_router
 from core.config import get_settings, Settings
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
@@ -66,4 +66,5 @@ app.include_router(certification_router)
 app.include_router(link_router)
 app.include_router(evaluation_router)
 app.include_router(personal_project_router)
+app.include_router(otp_router)
 

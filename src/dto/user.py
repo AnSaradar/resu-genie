@@ -66,3 +66,18 @@ class UserLogin(BaseModel):
     email: EmailStr = Field(..., description="User's email address")
     password: str = Field(..., description="User's password")
 
+class UserRegistrationResponse(BaseModel):
+    email: EmailStr
+    first_name: str
+    last_name: str
+    is_verified: bool
+    message: str
+    requires_verification: bool = True
+    
+    class Config:
+        from_attributes = True
+
+class ResendOTPRequest(BaseModel):
+    email: EmailStr = Field(..., description="User's email address")
+    purpose: str = Field(default="verification", description="Purpose of OTP resend")
+
